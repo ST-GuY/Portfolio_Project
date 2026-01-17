@@ -84,14 +84,37 @@ Cette stack a été choisie pour :
 
 ## 🗂️ Architecture simplifiée
 
+```txt
 src/
 ├─ app/
-│  ├─ page.tsx                # Page d’accueil (Home)
+│  ├─ page.tsx
 │  ├─ questionnaire/
-│  │  └─ page.tsx             # Questionnaire utilisateur
+│  │  └─ page.tsx
 │  └─ resultats/
-│     └─ page.tsx             # Page de recommandations
+│     └─ page.tsx
 ├─ data/
-│  └─ alcohols.ts             # Données des alcools (MVP)
+│  └─ alcohols.ts
 └─ lib/
-   └─ recommendation.ts       # Logique de recommandation
+   └─ recommendation.ts
+```
+
+---
+
+## ▶️ Lancer le projet en local
+
+### Prérequis
+- Node.js ≥ 18
+- npm
+
+### Installation
+```bash
+npm install
+```
+
+### Lancer le serveur de développement
+```bash
+npm run dev
+```
+
+L’application est accessible à l’adresse :
+http://localhost:3000
