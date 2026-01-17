@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🍷 Dégust&Moi
 
-## Getting Started
+Dégust&Moi est une application web éducative et non commerciale qui aide les utilisateurs
+à découvrir des alcools correspondant à leurs goûts, leur humeur ou leur contexte.
 
-First, run the development server:
+Le projet se concentre sur la découverte, la compréhension et la culture des alcools,
+sans vente, sans publicité et sans incitation à la consommation excessive.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎯 Objectif du projet
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+De nombreux utilisateurs rencontrent des difficultés lorsqu’ils doivent choisir un alcool,
+par manque de connaissances ou face à des descriptions trop expertes ou commerciales.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Dégust&Moi vise à :
+- simplifier la découverte des alcools
+- proposer des recommandations compréhensibles
+- expliquer clairement pourquoi un alcool est suggéré
+- promouvoir une approche responsable et pédagogique
 
-## Learn More
+Ce projet est développé dans le cadre d’un **MVP de portfolio**, avec un périmètre volontairement limité.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 👥 Public cible
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Débutants
+- Utilisateurs curieux
+- Consommateurs occasionnels
+- Personnes souhaitant apprendre sans pression commerciale
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## ⚙️ Fonctionnalités (MVP)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Fonctionnalités incluses
+- Page d’accueil présentant le concept
+- Questionnaire court (moins de 2 minutes)
+  - préférences de goût
+  - intensité souhaitée
+  - contexte ou humeur
+- Génération de **maximum 3 recommandations**
+- Explication éducative pour chaque recommandation
+- Navigation simple et fluide
+- Aucune création de compte
+
+### Hors périmètre (volontairement exclus)
+- Vente d’alcool
+- Publicité ou promotion de marque
+- Comptes utilisateurs
+- Avis ou notations communautaires
+- Algorithmes complexes ou IA
+
+---
+
+## 🧠 Logique de recommandation
+
+La recommandation repose sur :
+- des règles simples et lisibles
+- des correspondances entre préférences utilisateur et profils d’alcools
+- une logique transparente et explicable
+
+L’objectif n’est pas la précision algorithmique, mais la **compréhension et l’apprentissage**.
+
+---
+
+## 🧱 Stack technique
+
+- **Framework** : Next.js (App Router)
+- **UI** : React
+- **Langage** : TypeScript
+- **Styles** : Tailwind CSS
+- **Backend** : API Routes Next.js (léger)
+- **Données** : données mockées locales (MVP)
+- **Déploiement** : Vercel (prévu)
+
+Cette stack a été choisie pour :
+- sa popularité sur le marché
+- sa rapidité de mise en place
+- sa pertinence pour un projet solo et un MVP
+
+---
+
+## 🗂️ Architecture simplifiée
+
+src/
+├─ app/
+│  ├─ page.tsx                # Page d’accueil (Home)
+│  ├─ questionnaire/
+│  │  └─ page.tsx             # Questionnaire utilisateur
+│  └─ resultats/
+│     └─ page.tsx             # Page de recommandations
+├─ data/
+│  └─ alcohols.ts             # Données des alcools (MVP)
+└─ lib/
+   └─ recommendation.ts       # Logique de recommandation
