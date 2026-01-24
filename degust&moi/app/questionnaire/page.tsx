@@ -23,6 +23,14 @@ export default function QuestionnairePage() {
     <main className="min-h-screen flex justify-center px-4 py-12">
       <ThemeToggle />
 
+      {/* FIX GLOBAL POUR LES OPTIONS DU SELECT */}
+      <style jsx global>{`
+        option {
+          background-color: var(--bg-card);
+          color: var(--text-main);
+        }
+      `}</style>
+
       <div
         className="rounded-2xl shadow-xl p-8 w-full max-w-md"
         style={{ backgroundColor: "var(--bg-card)" }}
@@ -44,6 +52,10 @@ export default function QuestionnairePage() {
           <select
             required
             className="w-full border p-3 rounded-lg bg-transparent"
+            style={{
+              backgroundColor: "var(--bg-card)",
+              color: "var(--text-main)",
+            }}
             onChange={(e) =>
               setAnswers({ ...answers, sweetness: e.target.value })
             }
@@ -58,6 +70,10 @@ export default function QuestionnairePage() {
           <select
             required
             className="w-full border p-3 rounded-lg bg-transparent"
+            style={{
+              backgroundColor: "var(--bg-card)",
+              color: "var(--text-main)",
+            }}
             onChange={(e) =>
               setAnswers({ ...answers, intensity: e.target.value })
             }
@@ -72,6 +88,10 @@ export default function QuestionnairePage() {
           <select
             required
             className="w-full border p-3 rounded-lg bg-transparent"
+            style={{
+              backgroundColor: "var(--bg-card)",
+              color: "var(--text-main)",
+            }}
             onChange={(e) =>
               setAnswers({ ...answers, context: e.target.value })
             }
