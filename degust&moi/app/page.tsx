@@ -6,8 +6,10 @@ export default function HomePage() {
     <main className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
       <ThemeToggle />
 
-      <h1 className="text-5xl font-bold mb-6 text-gray-900 dark:text-white">
-        Dégust&Moi
+      <h1 className="text-5xl font-bold mb-6 animate-fade-in">
+        Dégust
+        <span className="text-indigo-500 dark:text-indigo-400">&</span>
+        Moi
       </h1>
 
       <p className="text-gray-600 dark:text-gray-300 max-w-xl mb-10">
@@ -17,10 +19,15 @@ export default function HomePage() {
 
       <Link
         href="/questionnaire"
-        className="bg-black dark:bg-white text-white dark:text-black px-8 py-4 rounded-lg hover:scale-105 transition"
+        className="bg-black dark:bg-white text-white dark:text-black px-8 py-4 rounded-lg
+                   hover:scale-105 transition-transform"
       >
         Commencer le questionnaire
       </Link>
+
+      <p className="mt-8 text-xs text-gray-500 dark:text-gray-400">
+        L’abus d’alcool est dangereux pour la santé. À consommer avec modération.
+      </p>
     </main>
   );
 }
