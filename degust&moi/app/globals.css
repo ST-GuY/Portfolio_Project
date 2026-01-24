@@ -1,13 +1,18 @@
 @import "tailwindcss";
 
-/* Reset minimal */
+/* Reset */
 html,
 body {
   margin: 0;
   padding: 0;
 }
 
-/* Animation douce d’apparition */
+/* Transitions globales (dark / light) */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Animation apparition */
 @keyframes fade-in {
   from {
     opacity: 0;

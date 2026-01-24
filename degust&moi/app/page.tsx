@@ -1,23 +1,26 @@
 import Link from "next/link";
+import ThemeToggle from "./components/ThemeToggle";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="max-w-2xl text-center">
-        <h1 className="text-5xl font-bold mb-6">Dégust&Moi</h1>
+    <main className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
+      <ThemeToggle />
 
-        <p className="text-lg text-gray-600 mb-8">
-          Découvrez des alcools adaptés à vos goûts, votre humeur ou votre
-          contexte, grâce à une approche simple, éducative et responsable.
-        </p>
+      <h1 className="text-5xl font-bold mb-6 text-gray-900 dark:text-white">
+        Dégust&Moi
+      </h1>
 
-        <a
-          href="/questionnaire"
-          className="inline-block bg-black text-white px-8 py-4 rounded-xl text-lg hover:bg-gray-800 transition"
-        >
-          Commencer le questionnaire
-        </a>
-      </div>
+      <p className="text-gray-600 dark:text-gray-300 max-w-xl mb-10">
+        Découvrez des alcools adaptés à vos goûts, votre humeur ou votre contexte,
+        grâce à une approche simple, éducative et responsable.
+      </p>
+
+      <Link
+        href="/questionnaire"
+        className="bg-black dark:bg-white text-white dark:text-black px-8 py-4 rounded-lg hover:scale-105 transition"
+      >
+        Commencer le questionnaire
+      </Link>
     </main>
   );
 }

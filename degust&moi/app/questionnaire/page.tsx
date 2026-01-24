@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function QuestionnairePage() {
   const router = useRouter();
@@ -20,7 +21,9 @@ export default function QuestionnairePage() {
 
   return (
     <main className="min-h-screen flex justify-center px-4 py-12">
-      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+      <ThemeToggle />
+
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold mb-6 text-center">
           Questionnaire
         </h1>
@@ -28,7 +31,7 @@ export default function QuestionnairePage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <select
             required
-            className="w-full border p-3 rounded"
+            className="w-full border p-3 rounded bg-white dark:bg-gray-700"
             onChange={(e) =>
               setAnswers({ ...answers, sweetness: e.target.value })
             }
@@ -41,7 +44,7 @@ export default function QuestionnairePage() {
 
           <select
             required
-            className="w-full border p-3 rounded"
+            className="w-full border p-3 rounded bg-white dark:bg-gray-700"
             onChange={(e) =>
               setAnswers({ ...answers, intensity: e.target.value })
             }
@@ -54,7 +57,7 @@ export default function QuestionnairePage() {
 
           <select
             required
-            className="w-full border p-3 rounded"
+            className="w-full border p-3 rounded bg-white dark:bg-gray-700"
             onChange={(e) =>
               setAnswers({ ...answers, context: e.target.value })
             }
@@ -67,7 +70,7 @@ export default function QuestionnairePage() {
 
           <button
             type="submit"
-            className="w-full bg-black text-white py-3 rounded hover:bg-gray-800 transition"
+            className="w-full bg-black dark:bg-white text-white dark:text-black py-3 rounded transition"
           >
             Voir les recommandations
           </button>
