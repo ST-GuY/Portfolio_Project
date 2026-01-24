@@ -65,14 +65,42 @@ L’objectif n’est pas la précision algorithmique, mais la **compréhension e
 
 ---
 
+## 🌐 Données & API externe
+
+Afin d’enrichir l’expérience utilisateur, Dégust&Moi utilise une API publique externe :
+
+TheCocktailDB
+
+🔗 https://www.thecocktaildb.com/api.php
+
+Cette API permet d’afficher, pour chaque recommandation :
+
+- un exemple réel et représentatif
+- une image
+- un nom
+- une description simple
+
+Les données issues de cette API sont utilisées à titre informatif et pédagogique uniquement.
+Elles ne constituent ni une recommandation commerciale, ni une incitation à la consommation.
+
+L’API est consommée via une API Route Next.js, afin de :
+
+- centraliser les appels externes
+- garantir une meilleure maintenabilité
+- conserver une architecture propre et évolutive
+
+---
+
 ## 🧱 Stack technique
 
 - **Framework** : Next.js (App Router)
 - **UI** : React
 - **Langage** : TypeScript
 - **Styles** : Tailwind CSS
-- **Backend** : API Routes Next.js (léger)
-- **Données** : données mockées locales (MVP)
+- **Backend** : API Routes Next.js
+- **Données** :
+  - données locales mockées (logique de recommandation)
+  - API externe (TheCocktailDB) pour l’enrichissement visuel
 - **Déploiement** : Vercel (prévu)
 
 Cette stack a été choisie pour :
@@ -90,8 +118,11 @@ src/
 │  ├─ page.tsx
 │  ├─ questionnaire/
 │  │  └─ page.tsx
-│  └─ resultats/
-│     └─ page.tsx
+│  ├─ resultats/
+│  │  └─ page.tsx
+│  └─ api/
+│     └─ alcohol/
+│        └─ route.ts
 ├─ data/
 │  └─ alcohols.ts
 └─ lib/
