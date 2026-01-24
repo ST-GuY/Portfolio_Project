@@ -22,7 +22,7 @@ export default function ResultatsPage() {
   }, []);
 
   return (
-    <main className="min-h-screen pb-28 px-4 py-8">
+    <main className="min-h-screen px-4 py-8 pb-28">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold mb-8 text-center">
           Vos recommandations
@@ -32,7 +32,11 @@ export default function ResultatsPage() {
           {recommendations.map((rec, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl shadow-md p-6 border"
+              style={{ animationDelay: `${index * 120}ms` }}
+              className="bg-white rounded-xl shadow-md p-6 border
+                         opacity-0 animate-fade-in
+                         hover:shadow-lg hover:-translate-y-1
+                         transition-all"
             >
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-xl font-semibold">{rec.name}</h2>
@@ -56,7 +60,8 @@ export default function ResultatsPage() {
         <div className="max-w-3xl mx-auto text-center">
           <a
             href="/questionnaire"
-            className="inline-block bg-black text-white px-8 py-3 rounded-lg"
+            className="inline-block bg-black text-white px-8 py-3 rounded
+                       hover:bg-gray-800 active:scale-95 transition-all"
           >
             Refaire le questionnaire
           </a>
