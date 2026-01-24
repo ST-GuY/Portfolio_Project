@@ -1,6 +1,5 @@
 import { alcohols, Alcohol } from "../data/alcohols";
 
-
 type Answers = {
   sweetness: string;
   intensity: string;
@@ -13,7 +12,7 @@ type Recommendation = Alcohol & {
 };
 
 export function getRecommendations(answers: Answers): Recommendation[] {
-  const scoredAlcohols = alcohols.map((alcohol) => {
+  const scoredAlcohols: Recommendation[] = alcohols.map((alcohol) => {
     let score = 0;
     const reasons: string[] = [];
 
@@ -42,8 +41,15 @@ export function getRecommendations(answers: Answers): Recommendation[] {
     };
   });
 
-  return scoredAlcohols
-    .filter((a) => a.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3);
+  // Trier tous les alcools par score décroissant
+  const sorted = scoredAlcohols.sort((a, b) => b.score - a.score);
+
+  // Priorité aux profils pertinents, sinon on complète
+  const withScore = sorted.filter((a) => a.score > 0);
+
+  if (withScore.length >= 3) {
+    return withScore.slice(0, 3);
+  }
+
+  return sorted.slice(0, 3);
 }
