@@ -23,15 +23,27 @@ export default function QuestionnairePage() {
     <main className="min-h-screen flex justify-center px-4 py-12">
       <ThemeToggle />
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">
+      <div
+        className="rounded-2xl shadow-xl p-8 w-full max-w-md"
+        style={{ backgroundColor: "var(--bg-card)" }}
+      >
+        <h1 className="text-3xl font-bold mb-2 text-center">
           Questionnaire
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <p
+          className="mb-8 text-center text-sm"
+          style={{ color: "var(--text-muted)" }}
+        >
+          Réponds à quelques questions pour recevoir jusqu’à 3 recommandations
+          adaptées à tes goûts.
+        </p>
+
+        <form onSubmit={handleSubmit} className="space-y-7">
+          {/* Goût */}
           <select
             required
-            className="w-full border p-3 rounded bg-white dark:bg-gray-700"
+            className="w-full border p-3 rounded-lg bg-transparent"
             onChange={(e) =>
               setAnswers({ ...answers, sweetness: e.target.value })
             }
@@ -42,9 +54,10 @@ export default function QuestionnairePage() {
             <option value="fruity">Fruité</option>
           </select>
 
+          {/* Intensité */}
           <select
             required
-            className="w-full border p-3 rounded bg-white dark:bg-gray-700"
+            className="w-full border p-3 rounded-lg bg-transparent"
             onChange={(e) =>
               setAnswers({ ...answers, intensity: e.target.value })
             }
@@ -55,9 +68,10 @@ export default function QuestionnairePage() {
             <option value="strong">Intense</option>
           </select>
 
+          {/* Contexte */}
           <select
             required
-            className="w-full border p-3 rounded bg-white dark:bg-gray-700"
+            className="w-full border p-3 rounded-lg bg-transparent"
             onChange={(e) =>
               setAnswers({ ...answers, context: e.target.value })
             }
@@ -70,9 +84,10 @@ export default function QuestionnairePage() {
 
           <button
             type="submit"
-            className="w-full bg-black dark:bg-white text-white dark:text-black py-3 rounded transition"
+            className="w-full py-3 rounded-xl text-white font-medium transition hover:opacity-90"
+            style={{ backgroundColor: "var(--accent)" }}
           >
-            Voir les recommandations
+            Voir les recommandations →
           </button>
         </form>
       </div>

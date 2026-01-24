@@ -27,7 +27,7 @@ export default function ResultatsPage() {
       <ThemeToggle />
 
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8 text-center">
+        <h1 className="text-4xl font-bold mb-10 text-center">
           Vos recommandations
         </h1>
 
@@ -35,22 +35,36 @@ export default function ResultatsPage() {
           {recommendations.map((rec, index) => (
             <div
               key={index}
-              style={{ animationDelay: `${index * 120}ms` }}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border
-                         opacity-0 animate-fade-in
-                         hover:shadow-lg hover:-translate-y-1
-                         transition-all"
+              style={{
+                animationDelay: `${index * 120}ms`,
+                backgroundColor: "var(--bg-card)",
+              }}
+              className="rounded-2xl shadow-md p-6 opacity-0 animate-fade-in hover:shadow-lg transition"
             >
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xl font-semibold">{rec.name}</h2>
-                <span className="text-sm bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-2xl font-semibold">
+                  {rec.name}
+                </h2>
+
+                <span
+                  className="text-xs px-3 py-1 rounded-full"
+                  style={{
+                    color: "var(--accent)",
+                    backgroundColor: "color-mix(in srgb, var(--accent) 15%, transparent)",
+                  }}
+                >
                   {rec.type}
                 </span>
               </div>
 
-              <p className="mt-3">{rec.description}</p>
+              <p className="mt-2">
+                {rec.description}
+              </p>
 
-              <p className="mt-4 text-sm italic text-gray-500 dark:text-gray-400">
+              <p
+                className="mt-4 text-sm italic"
+                style={{ color: "var(--text-muted)" }}
+              >
                 {rec.explanation}
               </p>
             </div>
@@ -59,11 +73,15 @@ export default function ResultatsPage() {
       </div>
 
       {/* Bouton fixe */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t p-4">
+      <div
+        className="fixed bottom-0 left-0 right-0 border-t p-4"
+        style={{ backgroundColor: "var(--bg-card)" }}
+      >
         <div className="max-w-3xl mx-auto text-center">
           <a
             href="/questionnaire"
-            className="inline-block bg-black dark:bg-white text-white dark:text-black px-8 py-3 rounded transition"
+            className="inline-block px-8 py-3 rounded-xl text-white transition hover:opacity-90"
+            style={{ backgroundColor: "var(--accent)" }}
           >
             Refaire le questionnaire
           </a>

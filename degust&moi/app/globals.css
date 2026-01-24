@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Déclaration du dark mode pour Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Reset */
 html,
 body {
@@ -7,7 +10,7 @@ body {
   padding: 0;
 }
 
-/* Transitions globales (dark / light) */
+/* Transition douce */
 * {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -26,4 +29,20 @@ body {
 
 .animate-fade-in {
   animation: fade-in 0.5s ease-out forwards;
+}
+
+:root {
+  --bg-main: #faf7f2;
+  --bg-card: #ffffff;
+  --text-main: #1f2933;
+  --text-muted: #6b7280;
+  --accent: #7a1f2b;
+}
+
+.dark {
+  --bg-main: #181414;
+  --bg-card: #221c1c;
+  --text-main: #f5f3ef;
+  --text-muted: #b8b1a8;
+  --accent: #c04a5a;
 }
