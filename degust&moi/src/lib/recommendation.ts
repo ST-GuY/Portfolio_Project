@@ -8,48 +8,56 @@ type Answers = {
 
 type Recommendation = Alcohol & {
   score: number;
-  explanation: string;
+  explanation: {
+    fr: string;
+    en: string;
+  };
 };
 
-export function getRecommendations(answers: Answers): Recommendation[] {
-  const scoredAlcohols: Recommendation[] = alcohols.map((alcohol) => {
+export function getRecommendations(
+  answers: Answers
+): Recommendation[] {
+  const scored = alcohols.map((alcohol) => {
     let score = 0;
-    const reasons: string[] = [];
+    const reasonsFr: string[] = [];
+    const reasonsEn: string[] = [];
 
     if (alcohol.sweetness === answers.sweetness) {
       score += 2;
-      reasons.push(`goût ${answers.sweetness}`);
+      reasonsFr.push(`goût ${answers.sweetness}`);
+      reasonsEn.push(`${answers.sweetness} taste`);
     }
 
     if (alcohol.intensity === answers.intensity) {
       score += 1;
-      reasons.push(`intensité ${answers.intensity}`);
+      reasonsFr.push(`intensité ${answers.intensity}`);
+      reasonsEn.push(`${answers.intensity} intensity`);
     }
 
     if (alcohol.contexts.includes(answers.context)) {
       score += 1;
-      reasons.push(`contexte adapté`);
+      reasonsFr.push("contexte adapté");
+      reasonsEn.push("suitable context");
     }
 
     return {
       ...alcohol,
       score,
-      explanation:
-        reasons.length > 0
-          ? `Recommandé pour son ${reasons.join(", ")}.`
-          : "Recommandation basée sur un profil proche de tes préférences.",
+      explanation: {
+        fr:
+          reasonsFr.length > 0
+            ? `Recommandé pour son ${reasonsFr.join(", ")}.`
+            : "Profil proche de vos préférences.",
+        en:
+          reasonsEn.length > 0
+            ? `Recommended for its ${reasonsEn.join(", ")}.`
+            : "Profile close to your preferences.",
+      },
     };
   });
 
-  // Trier tous les alcools par score décroissant
-  const sorted = scoredAlcohols.sort((a, b) => b.score - a.score);
-
-  // Priorité aux profils pertinents, sinon on complète
-  const withScore = sorted.filter((a) => a.score > 0);
-
-  if (withScore.length >= 3) {
-    return withScore.slice(0, 3);
-  }
-
-  return sorted.slice(0, 3);
+  return scored
+    .filter((a) => a.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
 }
