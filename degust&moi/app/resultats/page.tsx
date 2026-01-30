@@ -76,6 +76,7 @@ export default function ResultatsPage() {
   const [cocktails, setCocktails] = useState<Record<number, Drink | null>>({});
   const [bottles, setBottles] = useState<Record<number, Bottle | null>>({});
   const [openRecipe, setOpenRecipe] = useState<Record<number, boolean>>({});
+  const [visibleCards, setVisibleCards] = useState<number[]>([]);
 
   useEffect(() => {
     const storedLang = localStorage.getItem("lang") as Lang | null;
@@ -87,6 +88,13 @@ export default function ResultatsPage() {
     const answers = JSON.parse(stored);
     const recs = getRecommendations(answers);
     setRecommendations(recs);
+
+    // ✨ animation apparition cartes (stagger)
+    recs.forEach((_, index) => {
+      setTimeout(() => {
+        setVisibleCards((prev) => [...prev, index]);
+      }, index * 150);
+    });
 
     recs.forEach(async (rec, index) => {
       let apiType = "rum";
@@ -115,7 +123,7 @@ export default function ResultatsPage() {
     <main className="min-h-screen px-4 py-10 pb-32">
       <ThemeToggle />
 
-      {/* 🌍 Lang toggle */}
+      {/* Lang toggle */}
       <button
         onClick={toggleLang}
         className="fixed top-4 left-4 z-50 px-3 py-2 rounded-full border text-sm"
@@ -133,7 +141,14 @@ export default function ResultatsPage() {
           {recommendations.map((rec, index) => (
             <div
               key={index}
-              className="rounded-2xl shadow-lg p-6"
+              className={`
+                rounded-2xl shadow-lg p-6 transition-all duration-500 ease-out
+                ${
+                  visibleCards.includes(index)
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-6"
+                }
+              `}
               style={{ backgroundColor: "var(--bg-card)" }}
             >
               <h2 className="text-2xl font-semibold mb-1">
