@@ -26,16 +26,16 @@ type Bottle = {
 
 function translateInstructions(text: string) {
   const dictionary: Record<string, string> = {
-    "Shake": "Secouer",
-    "Stir": "Remuer",
-    "Strain": "Filtrer",
-    "Pour": "Verser",
-    "Add": "Ajouter",
-    "Serve": "Servir",
-    "Garnish": "Garnir",
-    "Fill": "Remplir",
-    "ice": "glace",
-    "glass": "verre",
+    Shake: "Secouer",
+    Stir: "Remuer",
+    Strain: "Filtrer",
+    Pour: "Verser",
+    Add: "Ajouter",
+    Serve: "Servir",
+    Garnish: "Garnir",
+    Fill: "Remplir",
+    ice: "glace",
+    glass: "verre",
   };
 
   let translated = text;
@@ -89,27 +89,56 @@ export default function ResultatsPage() {
     const recs = getRecommendations(answers);
     setRecommendations(recs);
 
-    // ✨ animation apparition cartes (stagger)
+    // ✨ Animation apparition cartes
     recs.forEach((_, index) => {
       setTimeout(() => {
         setVisibleCards((prev) => [...prev, index]);
       }, index * 150);
     });
 
+    // 🍸 Cocktails + 🧴 bouteilles
     recs.forEach(async (rec, index) => {
-      let apiType = "rum";
       const type = rec.type.toLowerCase();
 
-      if (type.includes("whisky")) apiType = "whiskey";
-      if (type.includes("gin")) apiType = "gin";
+      /* =======================
+         🔑 MAPPING CORRECT
+         - Cocktail API → whiskey
+         - Bouteille locale → whisky
+      ======================= */
 
-      const cocktailRes = await fetch(`/api/alcohol?type=${apiType}`);
+      let cocktailType = "rum";
+      let bottleType = "rum";
+
+      if (type.includes("whisky")) {
+        cocktailType = "whiskey";
+        bottleType = "whisky";
+      } else if (type.includes("gin")) {
+        cocktailType = "gin";
+        bottleType = "gin";
+      } else if (type.includes("tequila")) {
+        cocktailType = "tequila";
+        bottleType = "tequila";
+      }
+
+      // Cocktail
+      const cocktailRes = await fetch(
+        `/api/alcohol?type=${cocktailType}`
+      );
       const cocktailData = await cocktailRes.json();
-      setCocktails((prev) => ({ ...prev, [index]: cocktailData.drink }));
+      setCocktails((prev) => ({
+        ...prev,
+        [index]: cocktailData.drink ?? null,
+      }));
 
-      const bottleRes = await fetch(`/api/bottle?type=${apiType}`);
+      // Bouteille
+      const bottleRes = await fetch(
+        `/api/bottle?type=${bottleType}`
+      );
       const bottleData = await bottleRes.json();
-      setBottles((prev) => ({ ...prev, [index]: bottleData.bottle }));
+      setBottles((prev) => ({
+        ...prev,
+        [index]: bottleData.bottle ?? null,
+      }));
     });
   }, []);
 
@@ -123,7 +152,7 @@ export default function ResultatsPage() {
     <main className="min-h-screen px-4 py-10 pb-32">
       <ThemeToggle />
 
-      {/* Lang toggle */}
+      {/* 🌍 Lang toggle */}
       <button
         onClick={toggleLang}
         className="fixed top-4 left-4 z-50 px-3 py-2 rounded-full border text-sm"
@@ -170,18 +199,20 @@ export default function ResultatsPage() {
 
                   <div className="flex gap-4 items-center">
                     <img
-                      src={bottles[index].image}
-                      alt={bottles[index].name}
+                      src={bottles[index]!.image}
+                      alt={bottles[index]!.name}
                       className="w-24 h-24 rounded-lg object-cover"
                     />
                     <div>
-                      <p className="font-semibold">{bottles[index].name}</p>
+                      <p className="font-semibold">
+                        {bottles[index]!.name}
+                      </p>
                       <p className="text-sm">
                         {lang === "fr" ? "Origine" : "Origin"} :{" "}
-                        {bottles[index].origin}
+                        {bottles[index]!.origin}
                       </p>
                       <p className="text-sm mt-1">
-                        {bottles[index].description}
+                        {bottles[index]!.description}
                       </p>
                     </div>
                   </div>
