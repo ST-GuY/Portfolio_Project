@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ThemeToggle from "../components/ThemeToggle";
-import { getRecommendations } from "../../src/lib/recommendation";
+import { getRecommendations } from "@/src/lib/recommendation";
 import { alcoholCategories } from "@/src/data/alcoholCategories";
+import ThemeToggle from "../components/ThemeToggle";
+import LanguageToggle from "../components/LanguageToggle";
+import { useLanguage } from "../context/LanguageContext";
 
 type Cocktail = {
   strDrink: string;
@@ -13,7 +15,9 @@ type Cocktail = {
 };
 
 export default function ResultatsPage() {
-  const [recs, setRecs] = useState<any[]>([]);
+  const { lang } = useLanguage();
+
+  const [recommendations, setRecommendations] = useState<any[]>([]);
   const [cocktails, setCocktails] = useState<Record<number, Cocktail | null>>({});
   const [bottles, setBottles] = useState<Record<number, any>>({});
   const [openRecipe, setOpenRecipe] = useState<Record<number, boolean>>({});
@@ -23,20 +27,19 @@ export default function ResultatsPage() {
     if (!stored) return;
 
     const answers = JSON.parse(stored);
-    const recommendations = getRecommendations(answers);
-    setRecs(recommendations);
+    const recs = getRecommendations(answers);
+    setRecommendations(recs);
 
-    recommendations.forEach(async (rec, index) => {
+    recs.forEach(async (rec, index) => {
       const category = alcoholCategories.find(
         (c) => c.key === rec.type
       );
-
       if (!category) return;
 
-      // 🧴 bouteille
+      // 🍾 bouteille
       const bottleRes = await fetch(`/api/bottle?type=${category.key}`);
       const bottleData = await bottleRes.json();
-      setBottles((b) => ({ ...b, [index]: bottleData.bottle }));
+      setBottles((prev) => ({ ...prev, [index]: bottleData.bottle }));
 
       // 🍸 cocktail + recette
       if (category.hasCocktail) {
@@ -44,7 +47,7 @@ export default function ResultatsPage() {
           `/api/alcohol?type=${category.cocktailApiKey}`
         );
         const cocktailData = await cocktailRes.json();
-        setCocktails((c) => ({ ...c, [index]: cocktailData.drink }));
+        setCocktails((prev) => ({ ...prev, [index]: cocktailData.drink }));
       }
     });
   }, []);
@@ -52,92 +55,104 @@ export default function ResultatsPage() {
   function getIngredients(drink: Cocktail) {
     const list: string[] = [];
     for (let i = 1; i <= 15; i++) {
-      const ing = drink[`strIngredient${i}`];
+      const ingredient = drink[`strIngredient${i}`];
       const measure = drink[`strMeasure${i}`];
-      if (ing) list.push(measure ? `${measure} ${ing}` : ing);
+      if (ingredient) {
+        list.push(measure ? `${measure} ${ingredient}` : ingredient);
+      }
     }
     return list;
   }
 
   return (
-    <main className="min-h-screen px-4 py-10 pb-32">
+    <main className="min-h-screen px-4 py-10 pb-32 bg-[var(--bg)]">
       <ThemeToggle />
+      <LanguageToggle />
 
       <h1 className="text-4xl font-bold text-center mb-12">
-        Vos recommandations
+        {lang === "fr" ? "Vos recommandations" : "Your recommendations"}
       </h1>
 
       <div className="max-w-3xl mx-auto grid gap-10">
-        {recs.map((rec, i) => (
+        {recommendations.map((rec, index) => (
           <div
-            key={i}
-            className="bg-[var(--bg-card)] p-6 rounded-2xl shadow"
+            key={index}
+            className="bg-[var(--bg-card)] rounded-2xl shadow p-6 animate-fade-in"
           >
             <h2 className="text-2xl font-semibold mb-1">
-              {rec.name.fr}
+              {rec.name[lang]}
             </h2>
 
-            <p>{rec.description.fr}</p>
-            <p className="text-sm italic mt-2">{rec.explanation.fr}</p>
+            <p>{rec.description[lang]}</p>
 
-            {/* 🧴 BOUTEILLE */}
-            {bottles[i] && (
-              <div className="flex gap-4 mt-6 items-center border-t pt-4">
+            <p className="text-sm italic mt-2">
+              {rec.explanation[lang]}
+            </p>
+
+            {/* 🍾 BOUTEILLE */}
+            {bottles[index] && (
+              <div className="flex gap-4 items-center mt-6 border-t pt-4">
                 <img
-                  src={bottles[i].image}
-                  className="w-24 h-24 object-cover rounded-lg"
-                  alt={bottles[i].name}
+                  src={bottles[index].image}
+                  alt={bottles[index].name}
+                  className="w-24 h-24 rounded-lg object-cover"
                 />
                 <div>
-                  <p className="font-semibold">{bottles[i].name}</p>
-                  <p className="text-sm">{bottles[i].origin}</p>
-                  <p className="text-sm">{bottles[i].description}</p>
+                  <p className="font-semibold">{bottles[index].name}</p>
+                  <p className="text-sm">{bottles[index].origin}</p>
+                  <p className="text-sm">{bottles[index].description}</p>
                 </div>
               </div>
             )}
 
-            {/* 🍸 COCKTAIL + RECETTE */}
-            {cocktails[i] && (
+            {/* 🍸 COCKTAIL */}
+            {cocktails[index] && (
               <div className="mt-6 border-t pt-4">
                 <div className="flex gap-4 items-center">
                   <img
-                    src={cocktails[i]!.strDrinkThumb}
+                    src={cocktails[index]!.strDrinkThumb}
+                    alt={cocktails[index]!.strDrink}
                     className="w-24 h-24 rounded-lg object-cover"
-                    alt={cocktails[i]!.strDrink}
                   />
-
                   <div>
                     <p className="font-semibold">
-                      🍸 {cocktails[i]!.strDrink}
+                      🍸 {cocktails[index]!.strDrink}
                     </p>
                     <button
                       onClick={() =>
-                        setOpenRecipe((r) => ({
-                          ...r,
-                          [i]: !r[i],
+                        setOpenRecipe((prev) => ({
+                          ...prev,
+                          [index]: !prev[index],
                         }))
                       }
-                      className="text-sm underline mt-1"
-                      style={{ color: "var(--accent)" }}
+                      className="text-sm underline mt-1 text-[var(--accent)]"
                     >
-                      {openRecipe[i]
-                        ? "Masquer la recette ↑"
-                        : "Voir la recette ↓"}
+                      {openRecipe[index]
+                        ? lang === "fr"
+                          ? "Masquer la recette ↑"
+                          : "Hide recipe ↑"
+                        : lang === "fr"
+                        ? "Voir la recette ↓"
+                        : "View recipe ↓"}
                     </button>
                   </div>
                 </div>
 
-                {openRecipe[i] && (
+                {openRecipe[index] && (
                   <div className="mt-4 text-sm">
-                    <p className="font-medium mb-2">Ingrédients :</p>
+                    <p className="font-medium mb-2">
+                      {lang === "fr" ? "Ingrédients :" : "Ingredients:"}
+                    </p>
                     <ul className="list-disc ml-5 mb-3">
-                      {getIngredients(cocktails[i]!).map((x, idx) => (
-                        <li key={idx}>{x}</li>
+                      {getIngredients(cocktails[index]!).map((item, i) => (
+                        <li key={i}>{item}</li>
                       ))}
                     </ul>
 
-                    <p className="font-medium mb-1">Préparation :</p>
-                    <p>{cocktails[i]!.strInstructions}</p>
+                    <p className="font-medium mb-1">
+                      {lang === "fr" ? "Préparation :" : "Preparation:"}
+                    </p>
+                    <p>{cocktails[index]!.strInstructions}</p>
                   </div>
                 )}
               </div>
@@ -146,16 +161,23 @@ export default function ResultatsPage() {
         ))}
       </div>
 
-      {/* 🔁 BOUTON QUESTIONNAIRE */}
-      <div className="text-center mt-14">
+      {/* 🔁 RESTART */}
+      <div className="text-center mt-16">
         <a
           href="/questionnaire"
-          className="inline-block px-8 py-3 rounded-xl text-white"
-          style={{ background: "var(--accent)" }}
+          className="inline-block px-8 py-3 rounded-xl text-white bg-[var(--accent)] hover:scale-105 transition"
         >
-          Refaire le questionnaire
+          {lang === "fr"
+            ? "Refaire le questionnaire"
+            : "Restart questionnaire"}
         </a>
       </div>
+
+      <p className="text-xs text-center mt-10 opacity-70">
+        {lang === "fr"
+          ? "Les exemples présentés sont fournis à titre informatif et pédagogique. L’abus d’alcool est dangereux pour la santé."
+          : "Examples are provided for educational purposes only. Alcohol abuse is dangerous for your health."}
+      </p>
     </main>
   );
 }
