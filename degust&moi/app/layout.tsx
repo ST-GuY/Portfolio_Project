@@ -1,5 +1,12 @@
 import "./globals.css";
-import { LanguageProvider } from "./context/LanguageContext";
+import type { Metadata } from "next";
+import ThemeToggle from "./components/ThemeToggle";
+import LanguageToggle from "./components/LanguageToggle";
+
+export const metadata: Metadata = {
+  title: "Dégust&Moi",
+  description: "Découvre des alcools adaptés à tes goûts",
+};
 
 export default function RootLayout({
   children,
@@ -7,9 +14,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr">
-      <body>
-        <LanguageProvider>{children}</LanguageProvider>
+    <html lang="fr" suppressHydrationWarning>
+      <body className="bg-neutral-100 dark:bg-black text-neutral-900 dark:text-white transition-colors">
+        <ThemeToggle />
+        <LanguageToggle />
+
+        {children}
       </body>
     </html>
   );

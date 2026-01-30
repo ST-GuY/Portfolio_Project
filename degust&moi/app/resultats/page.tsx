@@ -1,200 +1,200 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getRecommendations } from "@/src/lib/recommendation";
-import { alcoholCategories } from "@/src/data/alcoholCategories";
-import ThemeToggle from "../components/ThemeToggle";
-import LanguageToggle from "../components/LanguageToggle";
-import { useLanguage } from "../context/LanguageContext";
+import Image from "next/image";
+import Link from "next/link";
+import { getRecommendations } from "../../src/lib/recommendation";
 
-type Cocktail = {
-  strDrink: string;
-  strDrinkThumb: string;
-  strInstructions: string;
-  [key: string]: string | null;
+/* ================= TYPES ================= */
+
+type Lang = "fr" | "en";
+
+type TextI18n = {
+  fr: string;
+  en: string;
 };
 
+type Bottle = {
+  name: TextI18n;
+  origin: TextI18n;
+  description: TextI18n;
+  image: string;
+};
+
+type Cocktail = {
+  name: string;
+  image: string;
+  ingredients: string[];
+  instructions: TextI18n;
+};
+
+type Recommendation = {
+  name: TextI18n;
+  type: string;
+  description: TextI18n;
+  explanation: TextI18n;
+  bottle?: Bottle;
+  cocktail?: Cocktail;
+};
+
+/* ================= COMPONENT ================= */
+
 export default function ResultatsPage() {
-  const { lang } = useLanguage();
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [lang, setLang] = useState<Lang>("fr");
 
-  const [recommendations, setRecommendations] = useState<any[]>([]);
-  const [cocktails, setCocktails] = useState<Record<number, Cocktail | null>>({});
-  const [bottles, setBottles] = useState<Record<number, any>>({});
-  const [openRecipe, setOpenRecipe] = useState<Record<number, boolean>>({});
+useEffect(() => {
+  // 🔹 Charger la langue
+  const storedLang = localStorage.getItem("lang") as Lang | null;
+  if (storedLang) setLang(storedLang);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("degust-moi-answers");
-    if (!stored) return;
+  const onLangChange = () => {
+    const updatedLang = localStorage.getItem("lang") as Lang | null;
+    if (updatedLang) setLang(updatedLang);
+  };
 
-    const answers = JSON.parse(stored);
-    const recs = getRecommendations(answers);
-    setRecommendations(recs);
+  window.addEventListener("languageChange", onLangChange);
 
-    recs.forEach(async (rec, index) => {
-      const category = alcoholCategories.find(
-        (c) => c.key === rec.type
-      );
-      if (!category) return;
-
-      // 🍾 bouteille
-      const bottleRes = await fetch(`/api/bottle?type=${category.key}`);
-      const bottleData = await bottleRes.json();
-      setBottles((prev) => ({ ...prev, [index]: bottleData.bottle }));
-
-      // 🍸 cocktail + recette
-      if (category.hasCocktail) {
-        const cocktailRes = await fetch(
-          `/api/alcohol?type=${category.cocktailApiKey}`
-        );
-        const cocktailData = await cocktailRes.json();
-        setCocktails((prev) => ({ ...prev, [index]: cocktailData.drink }));
-      }
-    });
-  }, []);
-
-  function getIngredients(drink: Cocktail) {
-    const list: string[] = [];
-    for (let i = 1; i <= 15; i++) {
-      const ingredient = drink[`strIngredient${i}`];
-      const measure = drink[`strMeasure${i}`];
-      if (ingredient) {
-        list.push(measure ? `${measure} ${ingredient}` : ingredient);
-      }
-    }
-    return list;
+  // 🔹 Charger les réponses du questionnaire
+  const storedAnswers = localStorage.getItem("degust-moi-answers");
+  if (storedAnswers) {
+    const answers = JSON.parse(storedAnswers);
+    const recos = getRecommendations(answers);
+    console.log("RECOMMENDATIONS:", recos);
+    setRecommendations(recos);
   }
 
+  return () => window.removeEventListener("languageChange", onLangChange);
+}, []);
+
   return (
-    <main className="min-h-screen px-4 py-10 pb-32 bg-[var(--bg)]">
-      <ThemeToggle />
-      <LanguageToggle />
+    <main className="min-h-screen bg-neutral-50 dark:bg-neutral-950 px-4 py-12 transition-colors">
+      <div className="max-w-4xl mx-auto">
 
-      <h1 className="text-4xl font-bold text-center mb-12">
-        {lang === "fr" ? "Vos recommandations" : "Your recommendations"}
-      </h1>
+        <h1 className="text-4xl font-bold text-center mb-12">
+          {lang === "fr" ? "Vos recommandations" : "Your recommendations"}
+        </h1>
 
-      <div className="max-w-3xl mx-auto grid gap-10">
-        {recommendations.map((rec, index) => (
-          <div
-            key={index}
-            className="bg-[var(--bg-card)] rounded-2xl shadow p-6 animate-fade-in"
-          >
-            <h2 className="text-2xl font-semibold mb-1">
-              {rec.name[lang]}
-            </h2>
+        <div className="space-y-10">
+          {recommendations.map((rec, index) => (
+            <div
+              key={index}
+              className="
+                rounded-2xl p-6 shadow-lg
+                bg-white dark:bg-neutral-900
+                text-neutral-900 dark:text-neutral-100
+                animate-fade-in
+              "
+            >
+              {/* TITLE */}
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="text-2xl font-semibold">
+                  {rec.name[lang]}
+                </h2>
+                <span className="text-xs px-3 py-1 rounded-full bg-neutral-200 dark:bg-neutral-800">
+                  {rec.type}
+                </span>
+              </div>
 
-            <p>{rec.description[lang]}</p>
+              <p className="text-neutral-600 dark:text-neutral-400">
+                {rec.description[lang]}
+              </p>
 
-            <p className="text-sm italic mt-2">
-              {rec.explanation[lang]}
-            </p>
+              <p className="mt-2 italic text-sm text-neutral-500">
+                {rec.explanation[lang]}
+              </p>
 
-            {/* 🍾 BOUTEILLE */}
-            {bottles[index] && (
-              <div className="flex gap-4 items-center mt-6 border-t pt-4">
-                <img
-                  src={bottles[index].image}
-                  alt={bottles[index].name}
-                  className="w-24 h-24 rounded-lg object-cover"
-                />
+              <hr className="my-6 border-neutral-200 dark:border-neutral-700" />
+
+              {/* BOTTLE */}
+              {rec.bottle && (
+                <div className="mb-6">
+                  <h3 className="font-semibold mb-3">
+                    🍾 {lang === "fr" ? "Bouteille suggérée" : "Suggested bottle"}
+                  </h3>
+
+                  <div className="flex gap-4 items-center">
+                    <Image
+                      src={rec.bottle.image}
+                      alt={rec.bottle.name[lang]}
+                      width={80}
+                      height={200}
+                      className="object-contain"
+                    />
+
+                    <div>
+                      <p className="font-medium">
+                        {rec.bottle.name[lang]}
+                      </p>
+                      <p className="text-sm text-neutral-500">
+                        {rec.bottle.origin[lang]}
+                      </p>
+                      <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                        {rec.bottle.description[lang]}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* COCKTAIL */}
+              {rec.cocktail && (
                 <div>
-                  <p className="font-semibold">
-                    {bottles[index].name[lang]}
-                  </p>
-                  <p className="text-sm">
-                    {bottles[index].origin[lang]}
-                  </p>
-                  <p className="text-sm">
-                    {bottles[index].description[lang]}
-                  </p>
-                </div>
-              </div>
-            )}
+                  <h3 className="font-semibold mb-3">
+                    🍸 {lang === "fr" ? "Cocktail associé" : "Associated cocktail"}
+                  </h3>
 
-            {/* 🍸 COCKTAIL */}
-            {cocktails[index] && (
-              <div className="mt-6 border-t pt-4">
-                <div className="flex gap-4 items-center">
-                  <img
-                    src={cocktails[index]!.strDrinkThumb}
-                    alt={cocktails[index]!.strDrink}
-                    className="w-24 h-24 rounded-lg object-cover"
-                  />
-                  <div>
-                    <p className="font-semibold">
-                      🍸 {cocktails[index]!.strDrink}
-                    </p>
-                    <button
-                      onClick={() =>
-                        setOpenRecipe((prev) => ({
-                          ...prev,
-                          [index]: !prev[index],
-                        }))
-                      }
-                      className="text-sm underline mt-1 text-[var(--accent)]"
-                    >
-                      {openRecipe[index]
-                        ? lang === "fr"
-                          ? "Masquer la recette ↑"
-                          : "Hide recipe ↑"
-                        : lang === "fr"
-                        ? "Voir la recette ↓"
-                        : "View recipe ↓"}
-                    </button>
+                  <div className="flex gap-4 items-start">
+                    <Image
+                      src={rec.cocktail.image}
+                      alt={rec.cocktail.name}
+                      width={90}
+                      height={90}
+                      className="rounded-lg"
+                    />
+
+                    <div>
+                      <p className="font-medium">{rec.cocktail.name}</p>
+
+                      <ul className="list-disc ml-5 text-sm mt-2 text-neutral-600 dark:text-neutral-400">
+                        {rec.cocktail.ingredients.map((ing, i) => (
+                          <li key={i}>{ing}</li>
+                        ))}
+                      </ul>
+
+                      <p className="text-sm mt-3 text-neutral-600 dark:text-neutral-400">
+                        {rec.cocktail.instructions[lang]}
+                      </p>
+                    </div>
                   </div>
                 </div>
+              )}
+            </div>
+          ))}
+        </div>
 
-                {openRecipe[index] && (
-                  <div className="mt-4 text-sm">
-                    <p className="font-medium mb-2">
-                      {lang === "fr" ? "Ingrédients :" : "Ingredients:"}
-                    </p>
-                    <ul className="list-disc ml-5 mb-3">
-                      {getIngredients(cocktails[index]!).map((item, i) => (
-                        <li key={i}>{item}</li>
-                      ))}
-                    </ul>
+        {/* BUTTON */}
+        <div className="text-center mt-16">
+          <Link
+            href="/questionnaire"
+            className="
+              inline-block px-8 py-4 rounded-xl
+              bg-rose-600 text-white
+              hover:bg-rose-500
+              dark:bg-rose-500 dark:hover:bg-rose-400
+              transition
+            "
+          >
+            {lang === "fr" ? "Refaire le questionnaire" : "Restart questionnaire"}
+          </Link>
+        </div>
 
-                    <p className="font-medium mb-1">
-                      {lang === "fr" ? "Préparation :" : "Preparation:"}
-                    </p>
-                    <p className="italic opacity-80">
-                      {lang === "fr"
-                        ? cocktails[index]!.strInstructions
-                        : cocktails[index]!.strInstructions}
-                    </p>
-
-                    <p className="text-xs mt-2 opacity-60">
-                      {lang === "fr"
-                        ? "ℹ️ Recette fournie par TheCocktailDB (anglais uniquement)."
-                        : "ℹ️ Recipe provided by TheCocktailDB (English only)."}
-                    </p>
-
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* 🔁 RESTART */}
-      <div className="text-center mt-16">
-        <a
-          href="/questionnaire"
-          className="inline-block px-8 py-3 rounded-xl text-white bg-[var(--accent)] hover:scale-105 transition"
-        >
+        <p className="text-xs text-center text-neutral-500 mt-10">
           {lang === "fr"
-            ? "Refaire le questionnaire"
-            : "Restart questionnaire"}
-        </a>
+            ? "Les exemples sont fournis à titre pédagogique. L’abus d’alcool est dangereux pour la santé."
+            : "Examples are provided for educational purposes. Alcohol abuse is dangerous for your health."}
+        </p>
       </div>
-
-      <p className="text-xs text-center mt-10 opacity-70">
-        {lang === "fr"
-          ? "Les exemples présentés sont fournis à titre informatif et pédagogique. L’abus d’alcool est dangereux pour la santé."
-          : "Examples are provided for educational purposes only. Alcohol abuse is dangerous for your health."}
-      </p>
     </main>
   );
 }
