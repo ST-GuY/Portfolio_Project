@@ -21,8 +21,9 @@ type Bottle = {
 };
 
 /* =======================
-   Traduction simple recette
+   Utils
 ======================= */
+
 function translateInstructions(text: string) {
   const dictionary: Record<string, string> = {
     "Shake": "Secouer",
@@ -43,7 +44,6 @@ function translateInstructions(text: string) {
     translated = translated.replace(new RegExp(en, "gi"), fr);
   });
 
-  // fallback FR propre
   if (/[a-z]{3,}/i.test(translated)) {
     return "Mélanger les ingrédients avec de la glace, filtrer dans un verre adapté et servir frais.";
   }
@@ -59,14 +59,16 @@ function getIngredients(drink: Drink) {
     const measure = drink[`strMeasure${i}`];
 
     if (ingredient) {
-      ingredients.push(
-        measure ? `${measure} ${ingredient}` : ingredient
-      );
+      ingredients.push(measure ? `${measure} ${ingredient}` : ingredient);
     }
   }
 
   return ingredients;
 }
+
+/* =======================
+   Page
+======================= */
 
 export default function ResultatsPage() {
   const [lang, setLang] = useState<Lang>("fr");
@@ -95,17 +97,11 @@ export default function ResultatsPage() {
 
       const cocktailRes = await fetch(`/api/alcohol?type=${apiType}`);
       const cocktailData = await cocktailRes.json();
-      setCocktails((prev) => ({
-        ...prev,
-        [index]: cocktailData.drink ?? null,
-      }));
+      setCocktails((prev) => ({ ...prev, [index]: cocktailData.drink }));
 
       const bottleRes = await fetch(`/api/bottle?type=${apiType}`);
       const bottleData = await bottleRes.json();
-      setBottles((prev) => ({
-        ...prev,
-        [index]: bottleData.bottle ?? null,
-      }));
+      setBottles((prev) => ({ ...prev, [index]: bottleData.bottle }));
     });
   }, []);
 
@@ -119,6 +115,7 @@ export default function ResultatsPage() {
     <main className="min-h-screen px-4 py-10 pb-32">
       <ThemeToggle />
 
+      {/* 🌍 Lang toggle */}
       <button
         onClick={toggleLang}
         className="fixed top-4 left-4 z-50 px-3 py-2 rounded-full border text-sm"
@@ -128,7 +125,7 @@ export default function ResultatsPage() {
       </button>
 
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-10 text-center">
+        <h1 className="text-4xl font-bold mb-12 text-center">
           {lang === "fr" ? "Vos recommandations" : "Your recommendations"}
         </h1>
 
@@ -158,27 +155,25 @@ export default function ResultatsPage() {
 
                   <div className="flex gap-4 items-center">
                     <img
-                      src={bottles[index]!.image}
-                      alt={bottles[index]!.name}
+                      src={bottles[index].image}
+                      alt={bottles[index].name}
                       className="w-24 h-24 rounded-lg object-cover"
                     />
                     <div>
-                      <p className="font-semibold">
-                        {bottles[index]!.name}
-                      </p>
+                      <p className="font-semibold">{bottles[index].name}</p>
                       <p className="text-sm">
                         {lang === "fr" ? "Origine" : "Origin"} :{" "}
-                        {bottles[index]!.origin}
+                        {bottles[index].origin}
                       </p>
                       <p className="text-sm mt-1">
-                        {bottles[index]!.description}
+                        {bottles[index].description}
                       </p>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* 🍸 COCKTAIL + RECETTE */}
+              {/* 🍸 COCKTAIL */}
               {cocktails[index] && (
                 <div className="mt-6 border-t pt-4">
                   <p className="font-medium mb-2">
@@ -204,25 +199,36 @@ export default function ResultatsPage() {
                             [index]: !prev[index],
                           }))
                         }
-                        className="text-sm underline mt-1"
+                        className="text-sm underline mt-1 transition-all hover:opacity-80"
                         style={{ color: "var(--accent)" }}
                       >
                         {openRecipe[index]
                           ? lang === "fr"
-                            ? "Masquer la recette"
-                            : "Hide recipe"
+                            ? "Masquer la recette ↑"
+                            : "Hide recipe ↑"
                           : lang === "fr"
-                          ? "Voir la recette"
-                          : "Show recipe"}
+                          ? "Voir la recette ↓"
+                          : "Show recipe ↓"}
                       </button>
                     </div>
                   </div>
 
-                  {openRecipe[index] && (
+                  {/* ✨ RECETTE ANIMÉE */}
+                  <div
+                    className={`
+                      overflow-hidden transition-all duration-500 ease-out
+                      ${
+                        openRecipe[index]
+                          ? "max-h-[500px] opacity-100 translate-y-0"
+                          : "max-h-0 opacity-0 -translate-y-2"
+                      }
+                    `}
+                  >
                     <div className="mt-4 text-sm">
                       <p className="font-medium mb-2">
                         {lang === "fr" ? "Ingrédients" : "Ingredients"} :
                       </p>
+
                       <ul className="list-disc ml-5 mb-3">
                         {getIngredients(cocktails[index]!).map((item, i) => (
                           <li key={i}>{item}</li>
@@ -232,6 +238,7 @@ export default function ResultatsPage() {
                       <p className="font-medium mb-1">
                         {lang === "fr" ? "Préparation" : "Preparation"} :
                       </p>
+
                       <p>
                         {lang === "fr"
                           ? translateInstructions(
@@ -240,7 +247,7 @@ export default function ResultatsPage() {
                           : cocktails[index]!.strInstructions}
                       </p>
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
             </div>
@@ -250,7 +257,7 @@ export default function ResultatsPage() {
         <div className="text-center mt-14">
           <a
             href="/questionnaire"
-            className="inline-block px-8 py-3 rounded-xl text-white"
+            className="inline-block px-8 py-3 rounded-xl text-white transition hover:opacity-90"
             style={{ backgroundColor: "var(--accent)" }}
           >
             {lang === "fr"
