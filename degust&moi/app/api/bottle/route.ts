@@ -1,22 +1,12 @@
-import { NextResponse } from "next/server";
-import { bottles } from "../../../src/data/bottles";
+import { bottles } from "@/src/data/bottles";
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
   const type = searchParams.get("type");
 
-  if (!type) {
-    return NextResponse.json({ bottle: null });
+  if (!type || !bottles[type]) {
+    return Response.json({ bottle: null });
   }
 
-  // Recherche dans toutes les catégories
-  for (const category of Object.values(bottles)) {
-    if ((category as any)[type]) {
-      return NextResponse.json({
-        bottle: (category as any)[type],
-      });
-    }
-  }
-
-  return NextResponse.json({ bottle: null });
+  return Response.json({ bottle: bottles[type] });
 }

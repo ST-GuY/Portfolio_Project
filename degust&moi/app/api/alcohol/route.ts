@@ -1,25 +1,26 @@
-import { NextResponse } from "next/server";
-
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
   const type = searchParams.get("type");
 
   if (!type) {
-    return NextResponse.json(
-      { error: "Missing alcohol type" },
-      { status: 400 }
-    );
+    return Response.json({ drink: null });
   }
 
-  // Appel TheCocktailDB
-  const response = await fetch(
-    `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${type}`
+  const res = await fetch(
+    `https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${type}`
   );
+  const data = await res.json();
 
-  const data = await response.json();
+  if (!data.drinks || data.drinks.length === 0) {
+    return Response.json({ drink: null });
+  }
 
-  // On retourne seulement le premier résultat (exemple)
-  const drink = data.drinks?.[0] ?? null;
+  const drinkId = data.drinks[0].idDrink;
 
-  return NextResponse.json({ drink });
+  const detailRes = await fetch(
+    `https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${drinkId}`
+  );
+  const detailData = await detailRes.json();
+
+  return Response.json({ drink: detailData.drinks[0] });
 }

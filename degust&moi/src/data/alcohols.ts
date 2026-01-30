@@ -1,16 +1,9 @@
-export type AlcoholCategory =
-  | "spiritueux"
-  | "vin"
-  | "biere"
-  | "liqueur";
-
 export type Alcohol = {
-  category: AlcoholCategory;
   name: {
     fr: string;
     en: string;
   };
-  type: string;
+  type: string; // 🔑 clé technique
   description: {
     fr: string;
     en: string;
@@ -22,72 +15,39 @@ export type Alcohol = {
 
 export const alcohols: Alcohol[] = [
   {
-    category: "spiritueux",
-    name: {
-      fr: "Rhum doux",
-      en: "Smooth rum",
-    },
-    type: "Rhum",
-    description: {
-      fr: "Un rhum rond et légèrement sucré, facile à apprécier.",
-      en: "A smooth and slightly sweet rum.",
-    },
-    sweetness: "sweet",
-    intensity: "medium",
-    contexts: ["calm", "aperitif"],
-  },
-  {
-    category: "spiritueux",
     name: {
       fr: "Whisky fruité",
       en: "Fruity whisky",
     },
-    type: "Whisky",
+    type: "whisky", // ✅
     description: {
       fr: "Un whisky accessible aux arômes fruités et équilibrés.",
-      en: "An approachable whisky with fruity aromas.",
+      en: "An accessible whisky with fruity notes.",
     },
     sweetness: "fruity",
     intensity: "medium",
     contexts: ["tasting", "calm"],
   },
   {
-    category: "spiritueux",
-    name: {
-      fr: "Gin sec",
-      en: "Dry gin",
-    },
-    type: "Gin",
-    description: {
-      fr: "Un gin sec et aromatique, idéal pour les cocktails frais.",
-      en: "A dry and aromatic gin, ideal for cocktails.",
-    },
-    sweetness: "dry",
-    intensity: "light",
-    contexts: ["aperitif", "tasting"],
-  },
-  {
-    category: "vin",
     name: {
       fr: "Vin rouge fruité",
       en: "Fruity red wine",
     },
-    type: "Vin",
+    type: "wine", // ✅
     description: {
       fr: "Un vin rouge souple aux arômes de fruits rouges.",
-      en: "A smooth red wine with red fruit notes.",
+      en: "A smooth red wine with red fruit aromas.",
     },
     sweetness: "fruity",
     intensity: "light",
     contexts: ["meal", "calm"],
   },
   {
-    category: "spiritueux",
     name: {
       fr: "Tequila blanche",
       en: "White tequila",
     },
-    type: "Tequila",
+    type: "tequila", // ✅
     description: {
       fr: "Une tequila fraîche et expressive.",
       en: "A fresh and expressive tequila.",
