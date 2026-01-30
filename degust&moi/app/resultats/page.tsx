@@ -21,6 +21,13 @@ type DrinkExample = {
   strAlcoholic: string;
 };
 
+type BottleExample = {
+  name: string;
+  origin: string;
+  description: string;
+  image: string;
+};
+
 /* =======================
    Utils
 ======================= */
@@ -44,13 +51,15 @@ function mapAlcoholType(type: string) {
 
 export default function ResultatsPage() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
-  const [examples, setExamples] = useState<Record<number, DrinkExample | null>>(
+  const [cocktails, setCocktails] = useState<Record<number, DrinkExample | null>>(
+    {}
+  );
+  const [bottles, setBottles] = useState<Record<number, BottleExample | null>>(
     {}
   );
 
   useEffect(() => {
     const stored = localStorage.getItem("degust-moi-answers");
-
     if (!stored) return;
 
     const answers = JSON.parse(stored);
@@ -58,20 +67,32 @@ export default function ResultatsPage() {
     setRecommendations(recs);
 
     recs.forEach(async (rec, index) => {
-      try {
-        const apiType = mapAlcoholType(rec.type);
-        const res = await fetch(`/api/alcohol?type=${apiType}`);
-        const data = await res.json();
+      const apiType = mapAlcoholType(rec.type);
 
-        setExamples((prev) => ({
+      try {
+        // Cocktail (API externe)
+        const cocktailRes = await fetch(`/api/alcohol?type=${apiType}`);
+        const cocktailData = await cocktailRes.json();
+
+        setCocktails((prev) => ({
           ...prev,
-          [index]: data.drink ?? null,
+          [index]: cocktailData.drink ?? null,
         }));
-      } catch (error) {
-        setExamples((prev) => ({
+      } catch {
+        setCocktails((prev) => ({ ...prev, [index]: null }));
+      }
+
+      try {
+        // Bouteille (API mockée)
+        const bottleRes = await fetch(`/api/bottle?type=${apiType}`);
+        const bottleData = await bottleRes.json();
+
+        setBottles((prev) => ({
           ...prev,
-          [index]: null,
+          [index]: bottleData.bottle ?? null,
         }));
+      } catch {
+        setBottles((prev) => ({ ...prev, [index]: null }));
       }
     });
   }, []);
@@ -85,7 +106,7 @@ export default function ResultatsPage() {
           Vos recommandations
         </h1>
 
-        <div className="grid gap-8">
+        <div className="grid gap-10">
           {recommendations.map((rec, index) => (
             <div
               key={index}
@@ -93,13 +114,11 @@ export default function ResultatsPage() {
                 backgroundColor: "var(--bg-card)",
                 animationDelay: `${index * 120}ms`,
               }}
-              className="rounded-2xl shadow-lg p-6 opacity-0 animate-fade-in hover:shadow-xl transition"
+              className="rounded-2xl shadow-lg p-6 opacity-0 animate-fade-in"
             >
               {/* Header */}
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-2xl font-semibold">
-                  {rec.name}
-                </h2>
+                <h2 className="text-2xl font-semibold">{rec.name}</h2>
 
                 <span
                   className="text-xs px-3 py-1 rounded-full"
@@ -113,10 +132,8 @@ export default function ResultatsPage() {
                 </span>
               </div>
 
-              {/* Description */}
-              <p className="mt-2">
-                {rec.description}
-              </p>
+              {/* Texte */}
+              <p className="mt-2">{rec.description}</p>
 
               <p
                 className="mt-4 text-sm italic"
@@ -125,32 +142,67 @@ export default function ResultatsPage() {
                 {rec.explanation}
               </p>
 
-              {/* Exemple API */}
-              {examples[index] && (
+              {/* BOUTEILLE */}
+              {bottles[index] && (
                 <div className="mt-6 border-t pt-4">
                   <p
                     className="text-sm mb-3"
                     style={{ color: "var(--text-muted)" }}
                   >
-                    Exemple représentatif :
+                    🧴 Exemple de bouteille
                   </p>
 
                   <div className="flex gap-4 items-center">
                     <img
-                      src={examples[index]!.strDrinkThumb}
-                      alt={examples[index]!.strDrink}
-                      className="w-20 h-20 rounded-lg object-cover"
+                      src={bottles[index]!.image}
+                      alt={bottles[index]!.name}
+                      className="w-24 h-24 rounded-lg object-cover"
                     />
 
                     <div>
                       <p className="font-medium">
-                        {examples[index]!.strDrink}
+                        {bottles[index]!.name}
                       </p>
                       <p
                         className="text-sm"
                         style={{ color: "var(--text-muted)" }}
                       >
-                        {examples[index]!.strAlcoholic}
+                        Origine : {bottles[index]!.origin}
+                      </p>
+                      <p className="text-sm mt-1">
+                        {bottles[index]!.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* COCKTAIL */}
+              {cocktails[index] && (
+                <div className="mt-6 border-t pt-4">
+                  <p
+                    className="text-sm mb-3"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    🍸 Cocktail que tu peux réaliser
+                  </p>
+
+                  <div className="flex gap-4 items-center">
+                    <img
+                      src={cocktails[index]!.strDrinkThumb}
+                      alt={cocktails[index]!.strDrink}
+                      className="w-24 h-24 rounded-lg object-cover"
+                    />
+
+                    <div>
+                      <p className="font-medium">
+                        {cocktails[index]!.strDrink}
+                      </p>
+                      <p
+                        className="text-sm"
+                        style={{ color: "var(--text-muted)" }}
+                      >
+                        {cocktails[index]!.strAlcoholic}
                       </p>
                     </div>
                   </div>
@@ -162,7 +214,7 @@ export default function ResultatsPage() {
 
         {/* Message responsable */}
         <p
-          className="mt-12 text-xs text-center"
+          className="mt-14 text-xs text-center"
           style={{ color: "var(--text-muted)" }}
         >
           Les exemples présentés sont fournis à titre informatif et pédagogique.
