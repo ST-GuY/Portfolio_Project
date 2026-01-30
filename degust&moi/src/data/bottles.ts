@@ -1,62 +1,81 @@
 export const bottles: Record<string, any> = {
-  gin: {
-    name: "Gin sec",
-    origin: "Europe",
-    description: "Gin aromatique et frais.",
-    image: "/bottles/gin.svg",
-  },
-  vodka: {
-    name: "Vodka douce",
-    origin: "Europe de l’Est",
-    description: "Vodka neutre et facile à mixer.",
-    image: "/bottles/vodka.svg",
-  },
-  rum: {
-    name: "Rhum ambré",
-    origin: "Antilles",
-    description: "Rhum rond et chaleureux.",
-    image: "/bottles/rum.svg",
-  },
-  whisky: {
-    name: "Whisky écossais",
-    origin: "Écosse",
-    description: "Whisky fruité et équilibré.",
-    image: "/bottles/whisky.svg",
-  },
   tequila: {
-    name: "Tequila blanche",
-    origin: "Mexique",
-    description: "Tequila vive et expressive.",
+    name: {
+      fr: "Tequila blanche",
+      en: "White tequila",
+    },
+    origin: {
+      fr: "Mexique",
+      en: "Mexico",
+    },
+    description: {
+      fr: "Tequila vive et expressive.",
+      en: "A fresh and expressive tequila.",
+    },
     image: "/bottles/tequila.svg",
   },
-  brandy: {
-    name: "Brandy",
-    origin: "France",
-    description: "Spiritueux chaud et rond.",
-    image: "/bottles/brandy.svg",
+
+  whisky: {
+    name: {
+      fr: "Whisky écossais",
+      en: "Scotch whisky",
+    },
+    origin: {
+      fr: "Écosse",
+      en: "Scotland",
+    },
+    description: {
+      fr: "Whisky fruité et équilibré.",
+      en: "A fruity and balanced whisky.",
+    },
+    image: "/bottles/whisky.svg",
   },
-  liqueur: {
-    name: "Liqueur",
-    origin: "Europe",
-    description: "Liqueur douce et aromatisée.",
-    image: "/bottles/liqueur.svg",
+
+  gin: {
+    name: {
+      fr: "Gin sec",
+      en: "Dry gin",
+    },
+    origin: {
+      fr: "Europe",
+      en: "Europe",
+    },
+    description: {
+      fr: "Gin aromatique et frais.",
+      en: "Aromatic and fresh gin.",
+    },
+    image: "/bottles/gin.svg",
   },
-  champagne: {
-    name: "Champagne",
-    origin: "France",
-    description: "Vin effervescent élégant.",
-    image: "/bottles/champagne.svg",
+
+  rum: {
+    name: {
+      fr: "Rhum ambré",
+      en: "Amber rum",
+    },
+    origin: {
+      fr: "Antilles",
+      en: "Caribbean",
+    },
+    description: {
+      fr: "Rhum rond et chaleureux.",
+      en: "Smooth and warm rum.",
+    },
+    image: "/bottles/rum.svg",
   },
+
   wine: {
-    name: "Vin rouge",
-    origin: "France",
-    description: "Vin rouge fruité et souple.",
+    name: {
+      fr: "Vin rouge",
+      en: "Red wine",
+    },
+    origin: {
+      fr: "France",
+      en: "France",
+    },
+    description: {
+      fr: "Vin rouge fruité et souple.",
+      en: "Smooth and fruity red wine.",
+    },
     image: "/bottles/vin-rouge.svg",
-  },
-  beer: {
-    name: "Bière artisanale",
-    origin: "Europe",
-    description: "Bière légère et rafraîchissante.",
-    image: "/bottles/beer.svg",
   },
 };

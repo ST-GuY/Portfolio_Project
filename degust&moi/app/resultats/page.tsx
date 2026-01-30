@@ -98,9 +98,15 @@ export default function ResultatsPage() {
                   className="w-24 h-24 rounded-lg object-cover"
                 />
                 <div>
-                  <p className="font-semibold">{bottles[index].name}</p>
-                  <p className="text-sm">{bottles[index].origin}</p>
-                  <p className="text-sm">{bottles[index].description}</p>
+                  <p className="font-semibold">
+                    {bottles[index].name[lang]}
+                  </p>
+                  <p className="text-sm">
+                    {bottles[index].origin[lang]}
+                  </p>
+                  <p className="text-sm">
+                    {bottles[index].description[lang]}
+                  </p>
                 </div>
               </div>
             )}
@@ -152,7 +158,18 @@ export default function ResultatsPage() {
                     <p className="font-medium mb-1">
                       {lang === "fr" ? "Préparation :" : "Preparation:"}
                     </p>
-                    <p>{cocktails[index]!.strInstructions}</p>
+                    <p className="italic opacity-80">
+                      {lang === "fr"
+                        ? cocktails[index]!.strInstructions
+                        : cocktails[index]!.strInstructions}
+                    </p>
+
+                    <p className="text-xs mt-2 opacity-60">
+                      {lang === "fr"
+                        ? "ℹ️ Recette fournie par TheCocktailDB (anglais uniquement)."
+                        : "ℹ️ Recipe provided by TheCocktailDB (English only)."}
+                    </p>
+
                   </div>
                 )}
               </div>
