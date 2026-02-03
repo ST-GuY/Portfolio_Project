@@ -1,208 +1,223 @@
 /* ================= TYPES ================= */
 
+export type LangText = {
+  fr: string;
+  en: string;
+};
+
+export type Bottle = {
+  name: LangText;
+  origin: LangText;
+  description: LangText;
+  image: string;
+};
+
+export type Cocktail = {
+  name: string;
+  image: string;
+  ingredients: string[];
+  instructions: LangText;
+  baseSpirit:
+    | "white_rum"
+    | "amber_rum"
+    | "gin"
+    | "vodka"
+    | "whisky"
+    | "tequila"
+    | "wine";
+};
+
+export type Recommendation = {
+  name: LangText;
+  type: string;
+  description: LangText;
+  explanation: LangText;
+  bottle?: Bottle;
+  cocktail?: Cocktail;
+  score: number;
+};
+
 type Answers = {
   sweetness: string;
   intensity: string;
   context: string;
 };
 
-type TextI18n = {
-  fr: string;
-  en: string;
-};
+/* ================= BOTTLES ================= */
 
-type Bottle = {
-  name: TextI18n;
-  origin: TextI18n;
-  description: TextI18n;
-  image: string;
-};
-
-type Cocktail = {
-  name: string;
-  image: string;
-  ingredients: string[];
-  instructions: TextI18n;
-};
-
-type Recommendation = {
-  name: TextI18n;
-  type: string;
-  description: TextI18n;
-  explanation: TextI18n;
-  score: number;
-  bottle?: Bottle;
-  cocktail?: Cocktail;
-};
-
-/* ================= DATA ================= */
-
-const ALCOHOLS: Recommendation[] = [
-  {
-    name: {
-      fr: "Vin rouge fruité",
-      en: "Fruity red wine",
-    },
-    type: "wine",
+const bottlesBySpirit: Record<string, Bottle> = {
+  white_rum: {
+    name: { fr: "Rhum blanc", en: "White rum" },
+    origin: { fr: "Caraïbes", en: "Caribbean" },
     description: {
-      fr: "Un vin rouge souple aux arômes de fruits rouges.",
-      en: "A smooth red wine with red fruit aromas.",
+      fr: "Rhum frais et léger, idéal pour les cocktails.",
+      en: "Fresh and light rum, perfect for cocktails.",
     },
-    explanation: {
-      fr: "",
-      en: "",
-    },
-    score: 0,
-    bottle: {
-      name: {
-        fr: "Vin rouge",
-        en: "Red wine",
-      },
-      origin: {
-        fr: "France",
-        en: "France",
-      },
-      description: {
-        fr: "Vin rouge fruité et facile à apprécier.",
-        en: "Fruity and easy-drinking red wine.",
-      },
-      image: "/bottles/wine-red.svg",
-    },
-    cocktail: {
-      name: "Sangria",
-      image:
-        "https://www.thecocktaildb.com/images/media/drink/xxyywq1454511117.jpg",
-      ingredients: ["Red wine", "Orange", "Sugar", "Brandy"],
-      instructions: {
-        fr: "Mélanger le vin avec les fruits, ajouter les autres ingrédients et servir bien frais.",
-        en: "Mix wine with fruits, add remaining ingredients and serve chilled.",
-      },
-    },
+    image: "/bottles/rum-white.svg",
   },
 
-  {
-    name: {
-      fr: "Whisky fruité",
-      en: "Fruity whisky",
-    },
-    type: "whisky",
+  amber_rum: {
+    name: { fr: "Rhum ambré", en: "Amber rum" },
+    origin: { fr: "Caraïbes", en: "Caribbean" },
     description: {
-      fr: "Un whisky accessible aux notes fruitées et équilibrées.",
-      en: "An accessible whisky with fruity and balanced notes.",
+      fr: "Rhum doux et chaleureux, idéal en dégustation.",
+      en: "Smooth and warm rum, great for sipping.",
     },
-    explanation: {
-      fr: "",
-      en: "",
-    },
-    score: 0,
-    bottle: {
-      name: {
-        fr: "Whisky écossais",
-        en: "Scotch whisky",
-      },
-      origin: {
-        fr: "Écosse",
-        en: "Scotland",
-      },
-      description: {
-        fr: "Whisky doux et fruité.",
-        en: "Smooth and fruity whisky.",
-      },
-      image: "/bottles/whisky.svg",
-    },
-    cocktail: {
-      name: "Whiskey Sour",
-      image:
-        "https://www.thecocktaildb.com/images/media/drink/hbkfsh1589574990.jpg",
-      ingredients: ["Whiskey", "Lemon juice", "Sugar"],
-      instructions: {
-        fr: "Secouer avec de la glace, filtrer et servir.",
-        en: "Shake with ice, strain and serve.",
-      },
-    },
+    image: "/bottles/rum-amber.svg",
   },
 
-  {
-    name: {
-      fr: "Rhum doux",
-      en: "Smooth rum",
+  gin: {
+    name: { fr: "Gin sec", en: "Dry gin" },
+    origin: { fr: "Angleterre", en: "England" },
+    description: {
+      fr: "Gin aromatique aux notes botaniques.",
+      en: "Aromatic gin with botanical notes.",
     },
-    type: "rum",
+    image: "/bottles/gin.svg",
+  },
+
+  whisky: {
+    name: { fr: "Whisky écossais", en: "Scotch whisky" },
+    origin: { fr: "Écosse", en: "Scotland" },
+    description: {
+      fr: "Whisky équilibré aux notes fruitées.",
+      en: "Balanced whisky with fruity notes.",
+    },
+    image: "/bottles/whisky.svg",
+  },
+
+  tequila: {
+    name: { fr: "Tequila blanche", en: "Blanco tequila" },
+    origin: { fr: "Mexique", en: "Mexico" },
+    description: {
+      fr: "Tequila vive et expressive.",
+      en: "Fresh and expressive tequila.",
+    },
+    image: "/bottles/tequila.svg",
+  },
+
+  wine: {
+    name: { fr: "Vin rouge", en: "Red wine" },
+    origin: { fr: "France", en: "France" },
+    description: {
+      fr: "Vin rouge fruité et souple.",
+      en: "Fruity and smooth red wine.",
+    },
+    image: "/bottles/wine-red.svg",
+  },
+};
+
+/* ================= COCKTAILS ================= */
+
+const cocktailsByType: Record<string, Cocktail> = {
+  rum: {
+    name: "Mojito",
+    image: "https://www.thecocktaildb.com/images/media/drink/metwgh1606770327.jpg",
+    ingredients: ["White rum", "Mint", "Lime", "Sugar", "Soda"],
+    instructions: {
+      fr: "Écraser la menthe, ajouter les ingrédients et compléter avec de l’eau gazeuse.",
+      en: "Muddle mint, add ingredients and top with soda water.",
+    },
+    baseSpirit: "white_rum",
+  },
+
+  whisky: {
+    name: "Whiskey Sour",
+    image: "https://www.thecocktaildb.com/images/media/drink/hbkfsh1589574990.jpg",
+    ingredients: ["Whisky", "Lemon", "Sugar"],
+    instructions: {
+      fr: "Mélanger les ingrédients avec de la glace et servir frais.",
+      en: "Shake ingredients with ice and serve chilled.",
+    },
+    baseSpirit: "whisky",
+  },
+
+  gin: {
+    name: "Gin Fizz",
+    image: "https://www.thecocktaildb.com/images/media/drink/xhl8q31504351772.jpg",
+    ingredients: ["Gin", "Lemon", "Sugar", "Soda"],
+    instructions: {
+      fr: "Secouer les ingrédients puis compléter avec de l’eau gazeuse.",
+      en: "Shake ingredients and top with soda water.",
+    },
+    baseSpirit: "gin",
+  },
+};
+
+/* ================= ALCOOLS ================= */
+
+const alcohols = [
+  {
+    name: { fr: "Rhum doux", en: "Smooth rum" },
+    type: "Rhum",
     description: {
       fr: "Un rhum rond et légèrement sucré.",
       en: "A smooth and slightly sweet rum.",
     },
-    explanation: {
-      fr: "",
-      en: "",
+    sweetness: "sweet",
+    intensity: "light",
+    contexts: ["calm", "aperitif"],
+    cocktailKey: "rum",
+  },
+
+  {
+    name: { fr: "Whisky fruité", en: "Fruity whisky" },
+    type: "Whisky",
+    description: {
+      fr: "Un whisky accessible aux arômes fruités.",
+      en: "An accessible whisky with fruity aromas.",
     },
-    score: 0,
-    bottle: {
-      name: {
-        fr: "Rhum ambré",
-        en: "Amber rum",
-      },
-      origin: {
-        fr: "Caraïbes",
-        en: "Caribbean",
-      },
-      description: {
-        fr: "Rhum doux et chaleureux.",
-        en: "Warm and smooth rum.",
-      },
-      image: "/bottles/rum.svg",
+    sweetness: "fruity",
+    intensity: "medium",
+    contexts: ["tasting"],
+    cocktailKey: "whisky",
+  },
+
+  {
+    name: { fr: "Gin sec", en: "Dry gin" },
+    type: "Gin",
+    description: {
+      fr: "Un gin sec et aromatique.",
+      en: "A dry and aromatic gin.",
     },
-    cocktail: {
-      name: "Mojito",
-      image:
-        "https://www.thecocktaildb.com/images/media/drink/metwgh1606770327.jpg",
-      ingredients: ["White rum", "Mint", "Lime", "Sugar", "Soda"],
-      instructions: {
-        fr: "Écraser la menthe, ajouter les ingrédients et compléter avec de l’eau gazeuse.",
-        en: "Muddle mint, add ingredients and top with soda water.",
-      },
-    },
+    sweetness: "dry",
+    intensity: "light",
+    contexts: ["aperitif"],
+    cocktailKey: "gin",
   },
 ];
 
-/* ================= LOGIC ================= */
+/* ================= MAIN FUNCTION ================= */
 
 export function getRecommendations(answers: Answers): Recommendation[] {
-  const scored = ALCOHOLS.map((alcohol) => {
+  const scored = alcohols.map((alcohol) => {
     let score = 0;
-    const reasons: string[] = [];
 
-    if (answers.sweetness === "sweet" && alcohol.type !== "whisky") {
-      score += 1;
-      reasons.push("goût");
-    }
+    if (alcohol.sweetness === answers.sweetness) score += 2;
+    if (alcohol.intensity === answers.intensity) score += 1;
+    if (alcohol.contexts.includes(answers.context)) score += 1;
 
-    if (answers.intensity === "light" && alcohol.type === "wine") {
-      score += 1;
-      reasons.push("intensité");
-    }
-
-    if (answers.context === "aperitif" && alcohol.type !== "whisky") {
-      score += 1;
-      reasons.push("contexte");
-    }
+    const cocktail = cocktailsByType[alcohol.cocktailKey];
+    const bottle = cocktail
+      ? bottlesBySpirit[cocktail.baseSpirit]
+      : undefined;
 
     return {
-      ...alcohol,
-      score,
+      name: alcohol.name,
+      type: alcohol.type,
+      description: alcohol.description,
       explanation: {
-        fr:
-          score > 0
-            ? `Recommandé pour son ${reasons.join(", ")}.`
-            : "Suggestion pédagogique basée sur un profil général.",
-        en:
-          score > 0
-            ? `Recommended for its ${reasons.join(", ")}.`
-            : "Educational suggestion based on a general profile.",
+        fr: "Recommandé selon tes préférences.",
+        en: "Recommended based on your preferences.",
       },
+      cocktail,
+      bottle,
+      score,
     };
   });
 
-  // ⚠️ IMPORTANT : on ne filtre PLUS → jamais de page vide
-  return scored.sort((a, b) => b.score - a.score).slice(0, 3);
+  return scored
+    .filter((a) => a.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
 }
