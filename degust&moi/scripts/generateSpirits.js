@@ -6,47 +6,57 @@ async function generateSpirits() {
   );
   const data = await res.json();
 
-  const rawIngredients = data.drinks.map(
-    (d) => d.strIngredient1
-  );
+  const ingredients = data.drinks.map(d => d.strIngredient1);
 
-  const mapping = {
-    "Light rum": "white_rum",
-    "White rum": "white_rum",
-    "Dark rum": "amber_rum",
-    "Spiced rum": "amber_rum",
-    "Overproof rum": "amber_rum",
+  const baseSpirits = [];
+  const liqueurs = [];
+  const others = [];
 
-    Vodka: "vodka",
-    Gin: "gin",
-    Tequila: "tequila",
+  ingredients.forEach((ing) => {
+    const lower = ing.toLowerCase();
 
-    Scotch: "whisky",
-    Whiskey: "whisky",
-    Bourbon: "whisky",
-    "Rye whiskey": "whisky",
-
-    Brandy: "brandy",
-    Cognac: "brandy",
-
-    "Red wine": "wine",
-    "White wine": "wine",
-  };
-
-  const spirits = new Set();
-
-  rawIngredients.forEach((ing) => {
-    if (mapping[ing]) {
-      spirits.add(mapping[ing]);
+    if (
+      lower.includes("vodka") ||
+      lower.includes("rum") ||
+      lower.includes("gin") ||
+      lower.includes("whisk") ||
+      lower.includes("tequila") ||
+      lower.includes("brandy") ||
+      lower.includes("cognac")
+    ) {
+      baseSpirits.push(ing);
+    } else if (
+      lower.includes("liqueur") ||
+      lower.includes("vermouth") ||
+      lower.includes("amaretto") ||
+      lower.includes("campari") ||
+      lower.includes("aperol") ||
+      lower.includes("triple sec") ||
+      lower.includes("curaçao")
+    ) {
+      liqueurs.push(ing);
+    } else {
+      others.push(ing);
     }
   });
 
   fs.writeFileSync(
-    "generatedSpirits.json",
-    JSON.stringify([...spirits], null, 2)
+    "generatedAlcohols.json",
+    JSON.stringify(
+      {
+        baseSpirits,
+        liqueurs,
+        others,
+      },
+      null,
+      2
+    )
   );
 
-  console.log("✅ Alcools générés :", [...spirits]);
+  console.log("✅ Génération terminée");
+  console.log("Base spirits:", baseSpirits.length);
+  console.log("Liqueurs:", liqueurs.length);
+  console.log("Others:", others.length);
 }
 
 generateSpirits();

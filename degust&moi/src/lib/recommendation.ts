@@ -1,9 +1,20 @@
+import { AVAILABLE_BASE_SPIRITS } from "./spiritMapping";
+
 /* ================= TYPES ================= */
 
 export type LangText = {
   fr: string;
   en: string;
 };
+
+export type BaseSpirit =
+  | "white_rum"
+  | "amber_rum"
+  | "gin"
+  | "vodka"
+  | "whisky"
+  | "tequila"
+  | "wine";
 
 export type Bottle = {
   name: LangText;
@@ -17,14 +28,7 @@ export type Cocktail = {
   image: string;
   ingredients: string[];
   instructions: LangText;
-  baseSpirit:
-    | "white_rum"
-    | "amber_rum"
-    | "gin"
-    | "vodka"
-    | "whisky"
-    | "tequila"
-    | "wine";
+  baseSpirit: BaseSpirit;
 };
 
 export type Recommendation = {
@@ -45,7 +49,7 @@ type Answers = {
 
 /* ================= BOTTLES ================= */
 
-const bottlesBySpirit: Record<string, Bottle> = {
+const bottlesBySpirit: Record<BaseSpirit, Bottle> = {
   white_rum: {
     name: { fr: "Rhum blanc", en: "White rum" },
     origin: { fr: "Caraïbes", en: "Caribbean" },
@@ -74,6 +78,16 @@ const bottlesBySpirit: Record<string, Bottle> = {
       en: "Aromatic gin with botanical notes.",
     },
     image: "/bottles/gin.svg",
+  },
+
+  vodka: {
+    name: { fr: "Vodka", en: "Vodka" },
+    origin: { fr: "Europe de l’Est", en: "Eastern Europe" },
+    description: {
+      fr: "Vodka neutre et pure, idéale pour les cocktails.",
+      en: "Neutral and clean vodka, perfect for cocktails.",
+    },
+    image: "/bottles/vodka.svg",
   },
 
   whisky: {
@@ -105,24 +119,15 @@ const bottlesBySpirit: Record<string, Bottle> = {
     },
     image: "/bottles/wine-red.svg",
   },
-    vodka: {
-    name: { fr: "Vodka", en: "Vodka" },
-    origin: { fr: "Europe de l’Est", en: "Eastern Europe" },
-    description: {
-      fr: "Vodka neutre et pure, idéale pour les cocktails.",
-      en: "Neutral and clean vodka, perfect for cocktails.",
-    },
-    image: "/bottles/vodka.svg",
-  },
-
 };
 
 /* ================= COCKTAILS ================= */
 
-const cocktailsByType: Record<string, Cocktail> = {
+const cocktailsByKey: Record<string, Cocktail> = {
   rum: {
     name: "Mojito",
-    image: "https://www.thecocktaildb.com/images/media/drink/metwgh1606770327.jpg",
+    image:
+      "https://www.thecocktaildb.com/images/media/drink/metwgh1606770327.jpg",
     ingredients: ["White rum", "Mint", "Lime", "Sugar", "Soda"],
     instructions: {
       fr: "Écraser la menthe, ajouter les ingrédients et compléter avec de l’eau gazeuse.",
@@ -133,7 +138,8 @@ const cocktailsByType: Record<string, Cocktail> = {
 
   whisky: {
     name: "Whiskey Sour",
-    image: "https://www.thecocktaildb.com/images/media/drink/hbkfsh1589574990.jpg",
+    image:
+      "https://www.thecocktaildb.com/images/media/drink/hbkfsh1589574990.jpg",
     ingredients: ["Whisky", "Lemon", "Sugar"],
     instructions: {
       fr: "Mélanger les ingrédients avec de la glace et servir frais.",
@@ -144,7 +150,8 @@ const cocktailsByType: Record<string, Cocktail> = {
 
   gin: {
     name: "Gin Fizz",
-    image: "https://www.thecocktaildb.com/images/media/drink/xhl8q31504351772.jpg",
+    image:
+      "https://www.thecocktaildb.com/images/media/drink/xhl8q31504351772.jpg",
     ingredients: ["Gin", "Lemon", "Sugar", "Soda"],
     instructions: {
       fr: "Secouer les ingrédients puis compléter avec de l’eau gazeuse.",
@@ -154,16 +161,16 @@ const cocktailsByType: Record<string, Cocktail> = {
   },
 
   vodka: {
-  name: "Moscow Mule",
-  image: "https://www.thecocktaildb.com/images/media/drink/3pylqc1504370988.jpg",
-  ingredients: ["Vodka", "Ginger beer", "Lime"],
-  instructions: {
-    fr: "Remplir un verre de glace, ajouter la vodka, le citron vert et compléter avec la ginger beer.",
-    en: "Fill a glass with ice, add vodka, lime juice and top with ginger beer.",
+    name: "Moscow Mule",
+    image:
+      "https://www.thecocktaildb.com/images/media/drink/3pylqc1504370988.jpg",
+    ingredients: ["Vodka", "Ginger beer", "Lime"],
+    instructions: {
+      fr: "Remplir un verre de glace, ajouter la vodka, le citron vert et compléter avec la ginger beer.",
+      en: "Fill a glass with ice, add vodka, lime juice and top with ginger beer.",
+    },
+    baseSpirit: "vodka",
   },
-  baseSpirit: "vodka",
-},
-
 };
 
 /* ================= ALCOOLS ================= */
@@ -180,6 +187,7 @@ const alcohols = [
     intensity: "light",
     contexts: ["calm", "aperitif"],
     cocktailKey: "rum",
+    fallbackSpirit: "amber_rum" as BaseSpirit,
   },
 
   {
@@ -193,6 +201,7 @@ const alcohols = [
     intensity: "medium",
     contexts: ["tasting"],
     cocktailKey: "whisky",
+    fallbackSpirit: "whisky" as BaseSpirit,
   },
 
   {
@@ -206,7 +215,9 @@ const alcohols = [
     intensity: "light",
     contexts: ["aperitif"],
     cocktailKey: "gin",
+    fallbackSpirit: "gin" as BaseSpirit,
   },
+
   {
     name: { fr: "Vodka neutre", en: "Neutral vodka" },
     type: "Vodka",
@@ -218,11 +229,18 @@ const alcohols = [
     intensity: "medium",
     contexts: ["aperitif"],
     cocktailKey: "vodka",
+    fallbackSpirit: "vodka" as BaseSpirit,
   },
-
 ];
 
-/* ================= MAIN FUNCTION ================= */
+/* ================= HELPERS ================= */
+
+function getBottle(spirit: BaseSpirit): Bottle | undefined {
+  if (!AVAILABLE_BASE_SPIRITS.includes(spirit)) return undefined;
+  return bottlesBySpirit[spirit];
+}
+
+/* ================= MAIN ================= */
 
 export function getRecommendations(answers: Answers): Recommendation[] {
   const scored = alcohols.map((alcohol) => {
@@ -232,20 +250,10 @@ export function getRecommendations(answers: Answers): Recommendation[] {
     if (alcohol.intensity === answers.intensity) score += 1;
     if (alcohol.contexts.includes(answers.context)) score += 1;
 
-    const cocktail = cocktailsByType[alcohol.cocktailKey];
-    const defaultBottleByType: Record<string, Bottle> = {
-      Rhum: bottlesBySpirit.amber_rum,
-      Whisky: bottlesBySpirit.whisky,
-      Gin: bottlesBySpirit.gin,
-      Tequila: bottlesBySpirit.tequila,
-      Wine: bottlesBySpirit.wine,
-      Vodka: bottlesBySpirit.vodka,
-    };
-
-    const bottle = cocktail
-      ? bottlesBySpirit[cocktail.baseSpirit]
-      : defaultBottleByType[alcohol.type];
-
+    const cocktail = cocktailsByKey[alcohol.cocktailKey];
+    const spirit = cocktail
+      ? cocktail.baseSpirit
+      : alcohol.fallbackSpirit;
 
     return {
       name: alcohol.name,
@@ -256,7 +264,7 @@ export function getRecommendations(answers: Answers): Recommendation[] {
         en: "Recommended based on your preferences.",
       },
       cocktail,
-      bottle,
+      bottle: getBottle(spirit),
       score,
     };
   });
