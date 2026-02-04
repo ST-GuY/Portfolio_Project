@@ -105,6 +105,16 @@ const bottlesBySpirit: Record<string, Bottle> = {
     },
     image: "/bottles/wine-red.svg",
   },
+    vodka: {
+    name: { fr: "Vodka", en: "Vodka" },
+    origin: { fr: "Europe de l’Est", en: "Eastern Europe" },
+    description: {
+      fr: "Vodka neutre et pure, idéale pour les cocktails.",
+      en: "Neutral and clean vodka, perfect for cocktails.",
+    },
+    image: "/bottles/vodka.svg",
+  },
+
 };
 
 /* ================= COCKTAILS ================= */
@@ -142,6 +152,18 @@ const cocktailsByType: Record<string, Cocktail> = {
     },
     baseSpirit: "gin",
   },
+
+  vodka: {
+  name: "Moscow Mule",
+  image: "https://www.thecocktaildb.com/images/media/drink/3pylqc1504370988.jpg",
+  ingredients: ["Vodka", "Ginger beer", "Lime"],
+  instructions: {
+    fr: "Remplir un verre de glace, ajouter la vodka, le citron vert et compléter avec la ginger beer.",
+    en: "Fill a glass with ice, add vodka, lime juice and top with ginger beer.",
+  },
+  baseSpirit: "vodka",
+},
+
 };
 
 /* ================= ALCOOLS ================= */
@@ -185,6 +207,19 @@ const alcohols = [
     contexts: ["aperitif"],
     cocktailKey: "gin",
   },
+  {
+    name: { fr: "Vodka neutre", en: "Neutral vodka" },
+    type: "Vodka",
+    description: {
+      fr: "Une vodka pure et discrète, parfaite en cocktail.",
+      en: "A clean and neutral vodka, perfect for cocktails.",
+    },
+    sweetness: "dry",
+    intensity: "medium",
+    contexts: ["aperitif"],
+    cocktailKey: "vodka",
+  },
+
 ];
 
 /* ================= MAIN FUNCTION ================= */
@@ -198,9 +233,19 @@ export function getRecommendations(answers: Answers): Recommendation[] {
     if (alcohol.contexts.includes(answers.context)) score += 1;
 
     const cocktail = cocktailsByType[alcohol.cocktailKey];
+    const defaultBottleByType: Record<string, Bottle> = {
+      Rhum: bottlesBySpirit.amber_rum,
+      Whisky: bottlesBySpirit.whisky,
+      Gin: bottlesBySpirit.gin,
+      Tequila: bottlesBySpirit.tequila,
+      Wine: bottlesBySpirit.wine,
+      Vodka: bottlesBySpirit.vodka,
+    };
+
     const bottle = cocktail
       ? bottlesBySpirit[cocktail.baseSpirit]
-      : undefined;
+      : defaultBottleByType[alcohol.type];
+
 
     return {
       name: alcohol.name,

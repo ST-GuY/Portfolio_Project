@@ -56,4 +56,17 @@ export const alcohols: Alcohol[] = [
     intensity: "strong",
     contexts: ["party", "aperitif"],
   },
+  {
+    name: { fr: "Vodka neutre", en: "Neutral vodka" },
+    type: "Vodka",
+    description: {
+      fr: "Une vodka pure et discrète, parfaite en cocktail.",
+      en: "A clean and neutral vodka, perfect for cocktails.",
+    },
+    sweetness: "dry",
+    intensity: "medium",
+    contexts: ["aperitif", "party"],
+    cocktailKey: "vodka",
+  },
+
 ];
