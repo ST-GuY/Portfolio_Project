@@ -16,7 +16,8 @@ export type BaseSpirit =
 
 /**
  * Mappe les ingrédients bruts de TheCocktailDB
- * vers des alcools de base pédagogiques.
+ * vers des alcools de base pédagogiques
+ * (mapping strict, utilisé en fallback)
  */
 const NORMALIZATION_MAP: Record<string, BaseSpirit> = {
   // 🍹 RUM
@@ -41,10 +42,14 @@ const NORMALIZATION_MAP: Record<string, BaseSpirit> = {
   // 🥃 BRANDY / COGNAC
   "brandy": "brandy",
   "cognac": "brandy",
+  "armagnac": "brandy",
 
   // 🍷 WINE
   "red wine": "wine",
   "white wine": "wine",
+  "wine": "wine",
+  "vermouth": "wine",
+  "sherry": "wine",
 };
 
 /* ================= HELPERS ================= */
@@ -53,7 +58,53 @@ const NORMALIZATION_MAP: Record<string, BaseSpirit> = {
  * Normalise un ingrédient brut vers un BaseSpirit
  */
 export function normalizeSpirit(raw: string): BaseSpirit | null {
+  if (!raw) return null;
+
   const key = raw.toLowerCase().trim();
+
+  /* ---------- BRANDY & VARIANTS ---------- */
+  if (key.includes("brandy")) return "brandy";
+  if (key === "cognac" || key === "armagnac") return "brandy";
+
+  /* ---------- VODKA ---------- */
+  if (key.includes("vodka")) return "vodka";
+
+  /* ---------- WHISKY / WHISKEY ---------- */
+  if (key.includes("whiskey") || key.includes("whisky")) {
+    return "whisky";
+  }
+
+  /* ---------- RUM ---------- */
+  if (key.includes("rum")) {
+    if (
+      key.includes("dark") ||
+      key.includes("gold") ||
+      key.includes("anejo") ||
+      key.includes("añejo") ||
+      key.includes("spiced") ||
+      key.includes("overproof")
+    ) {
+      return "amber_rum";
+    }
+    return "white_rum";
+  }
+
+  /* ---------- GIN ---------- */
+  if (key.includes("gin")) return "gin";
+
+  /* ---------- TEQUILA ---------- */
+  if (key.includes("tequila")) return "tequila";
+
+  /* ---------- WINE & FORTIFIED ---------- */
+  if (
+    key.includes("wine") ||
+    key.includes("vermouth") ||
+    key.includes("sherry")
+  ) {
+    return "wine";
+  }
+
+  /* ---------- STRICT FALLBACK ---------- */
   return NORMALIZATION_MAP[key] ?? null;
 }
 
