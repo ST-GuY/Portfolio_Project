@@ -14,7 +14,8 @@ export type BaseSpirit =
   | "vodka"
   | "whisky"
   | "tequila"
-  | "wine";
+  | "wine"
+  | "brandy";
 
 export type Bottle = {
   name: LangText;
@@ -119,6 +120,16 @@ const bottlesBySpirit: Record<BaseSpirit, Bottle> = {
     },
     image: "/bottles/wine-red.svg",
   },
+  brandy: {
+  name: { fr: "Cognac", en: "Cognac" },
+  origin: { fr: "France", en: "France" },
+  description: {
+    fr: "Eau-de-vie de vin élégante et chaleureuse, idéale en dégustation ou en cocktail.",
+    en: "Elegant grape brandy, perfect for sipping or cocktails.",
+  },
+  image: "/bottles/brandy.svg",
+},
+
 };
 
 /* ================= COCKTAILS ================= */
@@ -171,6 +182,16 @@ const cocktailsByKey: Record<string, Cocktail> = {
     },
     baseSpirit: "vodka",
   },
+    brandy: {
+    name: { fr: "Cognac", en: "Cognac" },
+    origin: { fr: "France", en: "France" },
+    description: {
+      fr: "Eau-de-vie de vin élégante et chaleureuse, idéale en dégustation ou en cocktail.",
+      en: "Elegant grape brandy, perfect for sipping or cocktails.",
+    },
+    image: "/bottles/brandy.svg",
+  },
+
 };
 
 /* ================= ALCOOLS ================= */

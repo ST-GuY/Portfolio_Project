@@ -1,5 +1,7 @@
 import data from "../data/generatedAlcohols.json";
 
+/* ================= TYPES ================= */
+
 export type BaseSpirit =
   | "white_rum"
   | "amber_rum"
@@ -10,37 +12,74 @@ export type BaseSpirit =
   | "brandy"
   | "wine";
 
+/* ================= NORMALIZATION MAP ================= */
+
+/**
+ * Mappe les ingrédients bruts de TheCocktailDB
+ * vers des alcools de base pédagogiques.
+ */
 const NORMALIZATION_MAP: Record<string, BaseSpirit> = {
+  // 🍹 RUM
   "light rum": "white_rum",
   "white rum": "white_rum",
   "dark rum": "amber_rum",
   "spiced rum": "amber_rum",
+  "overproof rum": "amber_rum",
 
-  vodka: "vodka",
-  gin: "gin",
+  // 🥃 WHISKY
+  "whiskey": "whisky",
+  "scotch": "whisky",
+  "bourbon": "whisky",
+  "rye whiskey": "whisky",
+  "blended whiskey": "whisky",
 
-  scotch: "whisky",
-  whiskey: "whisky",
-  bourbon: "whisky",
+  // 🍸 CLEAR SPIRITS
+  "vodka": "vodka",
+  "gin": "gin",
+  "tequila": "tequila",
 
-  tequila: "tequila",
+  // 🥃 BRANDY / COGNAC
+  "brandy": "brandy",
+  "cognac": "brandy",
 
-  brandy: "brandy",
-  cognac: "brandy",
-
+  // 🍷 WINE
   "red wine": "wine",
   "white wine": "wine",
 };
 
+/* ================= HELPERS ================= */
+
+/**
+ * Normalise un ingrédient brut vers un BaseSpirit
+ */
 export function normalizeSpirit(raw: string): BaseSpirit | null {
-  const key = raw.toLowerCase();
+  const key = raw.toLowerCase().trim();
   return NORMALIZATION_MAP[key] ?? null;
 }
 
+/* ================= AVAILABLE SPIRITS ================= */
+
+/**
+ * Liste finale des alcools de base disponibles,
+ * dérivés automatiquement de l'API.
+ */
 export const AVAILABLE_BASE_SPIRITS: BaseSpirit[] = Array.from(
   new Set(
     data.baseSpirits
       .map((s: string) => normalizeSpirit(s))
-      .filter(Boolean)
+      .filter((s): s is BaseSpirit => Boolean(s))
   )
-) as BaseSpirit[];
+);
+
+/* ================= DEBUG ================= */
+
+/**
+ * Affiche les alcools non mappés pour faciliter l’évolution
+ */
+const unknownSpirits = data.baseSpirits.filter(
+  (s: string) => !normalizeSpirit(s)
+);
+
+if (unknownSpirits.length > 0) {
+  console.warn("⚠️ Alcools non mappés depuis l’API :", unknownSpirits);
+}

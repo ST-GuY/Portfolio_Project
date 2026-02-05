@@ -68,5 +68,18 @@ export const alcohols: Alcohol[] = [
     contexts: ["aperitif", "party"],
     cocktailKey: "vodka",
   },
+    {
+    name: { fr: "Cognac", en: "Cognac" },
+    type: "Brandy",
+    description: {
+      fr: "Un cognac élégant et chaleureux, aux arômes de fruits secs et d’épices.",
+      en: "An elegant cognac with dried fruit and spice notes.",
+    },
+    sweetness: "dry",
+    intensity: "strong",
+    contexts: ["tasting"],
+    cocktailKey: "brandy",
+    fallbackSpirit: "brandy" as BaseSpirit,
+  },
 
 ];
