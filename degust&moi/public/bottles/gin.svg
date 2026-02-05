@@ -1,9 +1,18 @@
-<svg width="400" height="400" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
-  <rect width="200" height="400" fill="#f5f5f5"/>
-  <rect x="70" y="40" width="60" height="40" rx="10" fill="#333"/>
-  <rect x="50" y="80" width="100" height="260" rx="20" fill="#6ab7b5"/>
-  <rect x="65" y="150" width="70" height="80" rx="10" fill="#fff"/>
-  <text x="100" y="195" text-anchor="middle" font-size="14" fill="#333">
-    GIN
-  </text>
+<svg width="220" height="400" viewBox="0 0 220 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="liquidGin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e6f7f4"/>
+      <stop offset="100%" stop-color="#9bd6c7"/>
+    </linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="6" stdDeviation="10" flood-opacity="0.25"/></filter>
+  </defs>
+
+  <ellipse cx="110" cy="380" rx="60" ry="10" opacity="0.2"/>
+  <path d="M90 40 L130 40 L130 110 C130 140 160 160 160 220 L160 330 C160 350 60 350 60 330 L60 220 C60 160 90 140 90 110 Z"
+        fill="#ffffff" stroke="#ccc" stroke-width="3" filter="url(#shadow)"/>
+  <path d="M70 240 L150 240 L150 330 C150 345 70 345 70 330 Z" fill="url(#liquidGin)"/>
+  <rect x="85" y="20" width="50" height="40" rx="8" fill="#3b7d6b"/>
+  <rect x="90" y="10" width="40" height="20" rx="6" fill="#24594d"/>
+  <rect x="65" y="255" width="90" height="45" rx="6" fill="#eefaf7"/>
+  <text x="110" y="285" text-anchor="middle" font-size="18" font-family="Georgia" font-weight="bold">Gin</text>
 </svg>
