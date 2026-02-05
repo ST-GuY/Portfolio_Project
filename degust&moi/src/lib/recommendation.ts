@@ -120,16 +120,16 @@ const bottlesBySpirit: Record<BaseSpirit, Bottle> = {
     },
     image: "/bottles/wine-red.svg",
   },
-  brandy: {
-  name: { fr: "Cognac", en: "Cognac" },
-  origin: { fr: "France", en: "France" },
-  description: {
-    fr: "Eau-de-vie de vin élégante et chaleureuse, idéale en dégustation ou en cocktail.",
-    en: "Elegant grape brandy, perfect for sipping or cocktails.",
-  },
-  image: "/bottles/brandy.svg",
-},
 
+  brandy: {
+    name: { fr: "Cognac", en: "Cognac" },
+    origin: { fr: "France", en: "France" },
+    description: {
+      fr: "Eau-de-vie de vin élégante et chaleureuse.",
+      en: "Elegant grape brandy, warm and smooth.",
+    },
+    image: "/bottles/brandy.svg",
+  },
 };
 
 /* ================= COCKTAILS ================= */
@@ -177,21 +177,23 @@ const cocktailsByKey: Record<string, Cocktail> = {
       "https://www.thecocktaildb.com/images/media/drink/3pylqc1504370988.jpg",
     ingredients: ["Vodka", "Ginger beer", "Lime"],
     instructions: {
-      fr: "Remplir un verre de glace, ajouter la vodka, le citron vert et compléter avec la ginger beer.",
-      en: "Fill a glass with ice, add vodka, lime juice and top with ginger beer.",
+      fr: "Remplir un verre de glace, ajouter la vodka et compléter avec la ginger beer.",
+      en: "Fill a glass with ice, add vodka and top with ginger beer.",
     },
     baseSpirit: "vodka",
   },
-    brandy: {
-    name: { fr: "Cognac", en: "Cognac" },
-    origin: { fr: "France", en: "France" },
-    description: {
-      fr: "Eau-de-vie de vin élégante et chaleureuse, idéale en dégustation ou en cocktail.",
-      en: "Elegant grape brandy, perfect for sipping or cocktails.",
-    },
-    image: "/bottles/brandy.svg",
-  },
 
+  brandy: {
+    name: "Sidecar",
+    image:
+      "https://www.thecocktaildb.com/images/media/drink/stwxuq1439906852.jpg",
+    ingredients: ["Cognac", "Triple sec", "Lemon"],
+    instructions: {
+      fr: "Secouer les ingrédients avec de la glace et servir frais.",
+      en: "Shake ingredients with ice and serve chilled.",
+    },
+    baseSpirit: "brandy",
+  },
 };
 
 /* ================= ALCOOLS ================= */
@@ -251,6 +253,20 @@ const alcohols = [
     contexts: ["aperitif"],
     cocktailKey: "vodka",
     fallbackSpirit: "vodka" as BaseSpirit,
+  },
+
+  {
+    name: { fr: "Brandy élégant", en: "Elegant brandy" },
+    type: "Brandy",
+    description: {
+      fr: "Un brandy rond et chaleureux, idéal en dégustation.",
+      en: "A warm and rounded brandy, perfect for sipping.",
+    },
+    sweetness: "fruity",
+    intensity: "medium",
+    contexts: ["tasting", "calm"],
+    cocktailKey: "brandy",
+    fallbackSpirit: "brandy" as BaseSpirit,
   },
 ];
 
