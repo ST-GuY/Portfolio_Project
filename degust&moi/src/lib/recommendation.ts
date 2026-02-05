@@ -24,21 +24,13 @@ export type Bottle = {
   image: string;
 };
 
-export type Cocktail = {
-  name: string;
-  image: string;
-  ingredients: string[];
-  instructions: LangText;
-  baseSpirit: BaseSpirit;
-};
-
 export type Recommendation = {
   name: LangText;
   type: string;
   description: LangText;
   explanation: LangText;
   bottle?: Bottle;
-  cocktail?: Cocktail;
+  cocktailApiKey?: string; // 👈 clé API TheCocktailDB
   score: number;
 };
 
@@ -132,70 +124,6 @@ const bottlesBySpirit: Record<BaseSpirit, Bottle> = {
   },
 };
 
-/* ================= COCKTAILS ================= */
-
-const cocktailsByKey: Record<string, Cocktail> = {
-  rum: {
-    name: "Mojito",
-    image:
-      "https://www.thecocktaildb.com/images/media/drink/metwgh1606770327.jpg",
-    ingredients: ["White rum", "Mint", "Lime", "Sugar", "Soda"],
-    instructions: {
-      fr: "Écraser la menthe, ajouter les ingrédients et compléter avec de l’eau gazeuse.",
-      en: "Muddle mint, add ingredients and top with soda water.",
-    },
-    baseSpirit: "white_rum",
-  },
-
-  whisky: {
-    name: "Whiskey Sour",
-    image:
-      "https://www.thecocktaildb.com/images/media/drink/hbkfsh1589574990.jpg",
-    ingredients: ["Whisky", "Lemon", "Sugar"],
-    instructions: {
-      fr: "Mélanger les ingrédients avec de la glace et servir frais.",
-      en: "Shake ingredients with ice and serve chilled.",
-    },
-    baseSpirit: "whisky",
-  },
-
-  gin: {
-    name: "Gin Fizz",
-    image:
-      "https://www.thecocktaildb.com/images/media/drink/xhl8q31504351772.jpg",
-    ingredients: ["Gin", "Lemon", "Sugar", "Soda"],
-    instructions: {
-      fr: "Secouer les ingrédients puis compléter avec de l’eau gazeuse.",
-      en: "Shake ingredients and top with soda water.",
-    },
-    baseSpirit: "gin",
-  },
-
-  vodka: {
-    name: "Moscow Mule",
-    image:
-      "https://www.thecocktaildb.com/images/media/drink/3pylqc1504370988.jpg",
-    ingredients: ["Vodka", "Ginger beer", "Lime"],
-    instructions: {
-      fr: "Remplir un verre de glace, ajouter la vodka et compléter avec la ginger beer.",
-      en: "Fill a glass with ice, add vodka and top with ginger beer.",
-    },
-    baseSpirit: "vodka",
-  },
-
-  brandy: {
-    name: "Sidecar",
-    image:
-      "https://www.thecocktaildb.com/images/media/drink/stwxuq1439906852.jpg",
-    ingredients: ["Cognac", "Triple sec", "Lemon"],
-    instructions: {
-      fr: "Secouer les ingrédients avec de la glace et servir frais.",
-      en: "Shake ingredients with ice and serve chilled.",
-    },
-    baseSpirit: "brandy",
-  },
-};
-
 /* ================= ALCOOLS ================= */
 
 const alcohols = [
@@ -209,7 +137,7 @@ const alcohols = [
     sweetness: "sweet",
     intensity: "light",
     contexts: ["calm", "aperitif"],
-    cocktailKey: "rum",
+    cocktailApiKey: "Mojito",
     fallbackSpirit: "amber_rum" as BaseSpirit,
   },
 
@@ -223,7 +151,7 @@ const alcohols = [
     sweetness: "fruity",
     intensity: "medium",
     contexts: ["tasting"],
-    cocktailKey: "whisky",
+    cocktailApiKey: "Whiskey Sour",
     fallbackSpirit: "whisky" as BaseSpirit,
   },
 
@@ -237,7 +165,7 @@ const alcohols = [
     sweetness: "dry",
     intensity: "light",
     contexts: ["aperitif"],
-    cocktailKey: "gin",
+    cocktailApiKey: "Gin Fizz",
     fallbackSpirit: "gin" as BaseSpirit,
   },
 
@@ -251,7 +179,7 @@ const alcohols = [
     sweetness: "dry",
     intensity: "medium",
     contexts: ["aperitif"],
-    cocktailKey: "vodka",
+    cocktailApiKey: "Moscow Mule",
     fallbackSpirit: "vodka" as BaseSpirit,
   },
 
@@ -265,7 +193,7 @@ const alcohols = [
     sweetness: "fruity",
     intensity: "medium",
     contexts: ["tasting", "calm"],
-    cocktailKey: "brandy",
+    cocktailApiKey: "Sidecar",
     fallbackSpirit: "brandy" as BaseSpirit,
   },
 ];
@@ -287,11 +215,6 @@ export function getRecommendations(answers: Answers): Recommendation[] {
     if (alcohol.intensity === answers.intensity) score += 1;
     if (alcohol.contexts.includes(answers.context)) score += 1;
 
-    const cocktail = cocktailsByKey[alcohol.cocktailKey];
-    const spirit = cocktail
-      ? cocktail.baseSpirit
-      : alcohol.fallbackSpirit;
-
     return {
       name: alcohol.name,
       type: alcohol.type,
@@ -300,8 +223,8 @@ export function getRecommendations(answers: Answers): Recommendation[] {
         fr: "Recommandé selon tes préférences.",
         en: "Recommended based on your preferences.",
       },
-      cocktail,
-      bottle: getBottle(spirit),
+      cocktailApiKey: alcohol.cocktailApiKey,
+      bottle: getBottle(alcohol.fallbackSpirit),
       score,
     };
   });
