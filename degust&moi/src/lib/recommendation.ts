@@ -30,7 +30,7 @@ export type Recommendation = {
   description: LangText;
   explanation: LangText;
   bottle?: Bottle;
-  cocktailApiKey?: string; // 👈 clé API TheCocktailDB
+  cocktailApiKeys?: string[]; // 👈 plusieurs cocktails
   score: number;
 };
 
@@ -126,7 +126,18 @@ const bottlesBySpirit: Record<BaseSpirit, Bottle> = {
 
 /* ================= ALCOOLS ================= */
 
-const alcohols = [
+type AlcoholProfile = {
+  name: LangText;
+  type: string;
+  description: LangText;
+  sweetness: string;
+  intensity: string;
+  contexts: string[];
+  cocktailApiKeys: string[]; // 👈 plusieurs cocktails
+  fallbackSpirit: BaseSpirit;
+};
+
+const alcohols: AlcoholProfile[] = [
   {
     name: { fr: "Rhum doux", en: "Smooth rum" },
     type: "Rhum",
@@ -137,8 +148,8 @@ const alcohols = [
     sweetness: "sweet",
     intensity: "light",
     contexts: ["calm", "aperitif"],
-    cocktailApiKey: "Mojito",
-    fallbackSpirit: "amber_rum" as BaseSpirit,
+    cocktailApiKeys: ["Mojito", "Daiquiri", "Caipirinha"],
+    fallbackSpirit: "white_rum",
   },
 
   {
@@ -151,8 +162,8 @@ const alcohols = [
     sweetness: "fruity",
     intensity: "medium",
     contexts: ["tasting"],
-    cocktailApiKey: "Whiskey Sour",
-    fallbackSpirit: "whisky" as BaseSpirit,
+    cocktailApiKeys: ["Whiskey Sour", "Old Fashioned"],
+    fallbackSpirit: "whisky",
   },
 
   {
@@ -165,8 +176,8 @@ const alcohols = [
     sweetness: "dry",
     intensity: "light",
     contexts: ["aperitif"],
-    cocktailApiKey: "Gin Fizz",
-    fallbackSpirit: "gin" as BaseSpirit,
+    cocktailApiKeys: ["Gin Fizz", "Tom Collins", "Negroni"],
+    fallbackSpirit: "gin",
   },
 
   {
@@ -179,8 +190,8 @@ const alcohols = [
     sweetness: "dry",
     intensity: "medium",
     contexts: ["aperitif"],
-    cocktailApiKey: "Moscow Mule",
-    fallbackSpirit: "vodka" as BaseSpirit,
+    cocktailApiKeys: ["Moscow Mule", "Bloody Mary"],
+    fallbackSpirit: "vodka",
   },
 
   {
@@ -193,8 +204,8 @@ const alcohols = [
     sweetness: "fruity",
     intensity: "medium",
     contexts: ["tasting", "calm"],
-    cocktailApiKey: "Sidecar",
-    fallbackSpirit: "brandy" as BaseSpirit,
+    cocktailApiKeys: ["Sidecar", "Brandy Alexander"],
+    fallbackSpirit: "brandy",
   },
 ];
 
@@ -208,7 +219,7 @@ function getBottle(spirit: BaseSpirit): Bottle | undefined {
 /* ================= MAIN ================= */
 
 export function getRecommendations(answers: Answers): Recommendation[] {
-  const scored = alcohols.map((alcohol) => {
+  const scored: Recommendation[] = alcohols.map((alcohol) => {
     let score = 0;
 
     if (alcohol.sweetness === answers.sweetness) score += 2;
@@ -223,8 +234,8 @@ export function getRecommendations(answers: Answers): Recommendation[] {
         fr: "Recommandé selon tes préférences.",
         en: "Recommended based on your preferences.",
       },
-      cocktailApiKey: alcohol.cocktailApiKey,
       bottle: getBottle(alcohol.fallbackSpirit),
+      cocktailApiKeys: alcohol.cocktailApiKeys,
       score,
     };
   });

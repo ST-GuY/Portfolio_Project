@@ -20,17 +20,20 @@ type Recommendation = {
     description: { fr: string; en: string };
     image: string;
   };
-  cocktailApiKey?: string;
+  cocktailApiKeys?: string[];
 };
+
+type Drink = any;
 
 /* ================= COMPONENT ================= */
 
 export default function ResultatsPage() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
-  const [cocktails, setCocktails] = useState<Record<number, any>>({});
+  const [cocktails, setCocktails] = useState<Record<number, Drink[]>>({});
   const [lang, setLang] = useState<Lang>("fr");
 
   useEffect(() => {
+    /* ---------- LANG ---------- */
     const storedLang = localStorage.getItem("lang") as Lang | null;
     if (storedLang) setLang(storedLang);
 
@@ -40,30 +43,35 @@ export default function ResultatsPage() {
     };
     window.addEventListener("languageChange", onLangChange);
 
+    /* ---------- ANSWERS / RECO ---------- */
     const storedAnswers = localStorage.getItem("degust-moi-answers");
-    if (storedAnswers) {
-      const answers = JSON.parse(storedAnswers);
-      const recos = getRecommendations(answers);
-      setRecommendations(recos);
+    if (!storedAnswers) return;
 
-      // 🔹 FETCH API POUR CHAQUE COCKTAIL
-      recos.forEach((rec, index) => {
-        if (!rec.cocktailApiKey) return;
+    const answers = JSON.parse(storedAnswers);
+    const recos = getRecommendations(answers);
+    setRecommendations(recos);
 
-        fetch(
-          `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${encodeURIComponent(
-            rec.cocktailApiKey
-          )}`
+    /* ---------- COCKTAIL API ---------- */
+    recos.forEach((rec, index) => {
+      if (!rec.cocktailApiKeys?.length) return;
+
+      Promise.all(
+        rec.cocktailApiKeys.map((cocktailName) =>
+          fetch(
+            `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${encodeURIComponent(
+              cocktailName
+            )}`
+          )
+            .then((res) => res.json())
+            .then((data) => data.drinks?.[0] ?? null)
         )
-          .then((res) => res.json())
-          .then((data) => {
-            setCocktails((prev) => ({
-              ...prev,
-              [index]: data.drinks?.[0] ?? null,
-            }));
-          });
+      ).then((drinks) => {
+        setCocktails((prev) => ({
+          ...prev,
+          [index]: drinks.filter(Boolean),
+        }));
       });
-    }
+    });
 
     return () =>
       window.removeEventListener("languageChange", onLangChange);
@@ -73,29 +81,33 @@ export default function ResultatsPage() {
     <main className="min-h-screen bg-neutral-50 dark:bg-neutral-950 px-4 py-12">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-center mb-12">
-          {lang === "fr" ? "Vos recommandations" : "Your recommendations"}
+          {lang === "fr"
+            ? "Vos recommandations"
+            : "Your recommendations"}
         </h1>
 
-        <div className="space-y-10">
+        <div className="space-y-12">
           {recommendations.map((rec, index) => {
-            const drink = cocktails[index];
+            const drinks = cocktails[index];
 
             return (
               <div
                 key={index}
-                className="rounded-2xl p-6 shadow-lg bg-white dark:bg-neutral-900"
+                className="rounded-2xl p-6 shadow-lg bg-white dark:bg-neutral-900 space-y-6"
               >
-                <h2 className="text-2xl font-semibold">
-                  {rec.name[lang]}
-                </h2>
-
-                <p className="text-neutral-600 dark:text-neutral-400">
-                  {rec.description[lang]}
-                </p>
+                {/* ALCOOL */}
+                <div>
+                  <h2 className="text-2xl font-semibold">
+                    {rec.name[lang]}
+                  </h2>
+                  <p className="text-neutral-600 dark:text-neutral-400">
+                    {rec.description[lang]}
+                  </p>
+                </div>
 
                 {/* BOTTLE */}
                 {rec.bottle && (
-                  <div className="mt-6 flex gap-4 items-center">
+                  <div className="flex gap-4 items-center">
                     <Image
                       src={rec.bottle.image}
                       alt={rec.bottle.name[lang]}
@@ -106,49 +118,67 @@ export default function ResultatsPage() {
                       <p className="font-medium">
                         {rec.bottle.name[lang]}
                       </p>
-                      <p className="text-sm">
+                      <p className="text-sm text-neutral-500">
                         {rec.bottle.origin[lang]}
                       </p>
                     </div>
                   </div>
                 )}
 
-                {/* COCKTAIL */}
-        {drink && (
-        <div className="mt-6">
-          <h3 className="font-semibold mb-3">
-            🍸 {drink.strDrink}
-          </h3>
+                {/* COCKTAILS */}
+                {drinks?.map((drink, i) => (
+                  <div
+                    key={`${drink.idDrink}-${i}`}
+                    className="border-t pt-4 space-y-3"
+                  >
+                    {/* NOM + LANGUE */}
+                    <h3 className="font-semibold flex items-center gap-2">
+                      🍸 {drink.strDrink}
+                      {lang === "fr" && (
+                        <span className="text-xs opacity-70">
+                          🌍 EN
+                        </span>
+                      )}
+                    </h3>
 
-          <div className="flex gap-4 items-start">
-            {/* IMAGE DU COCKTAIL */}
-            {drink.strDrinkThumb && (
-              <Image
-                src={drink.strDrinkThumb}
-                alt={drink.strDrink}
-                width={90}
-                height={90}
-                className="rounded-lg object-cover"
-              />
-            )}
+                    {/* BADGE INFO */}
+                    <p className="text-xs text-neutral-500 italic">
+                      {lang === "fr"
+                        ? "Recette originale (EN)"
+                        : "Original recipe"}
+                    </p>
 
-            {/* TEXTE */}
-            <div>
-              <ul className="list-disc ml-5 text-sm">
-                {parseIngredients(drink).map((i, idx) => (
-                  <li key={idx}>{i}</li>
+                    <div className="flex gap-4 items-start">
+                      {drink.strDrinkThumb && (
+                        <Image
+                          src={drink.strDrinkThumb}
+                          alt={drink.strDrink}
+                          width={90}
+                          height={90}
+                          className="rounded-lg object-cover"
+                        />
+                      )}
+
+                      <div>
+                        <ul className="list-disc ml-5 text-sm">
+                          {parseIngredients(drink).map(
+                            (ingredient, idx) => (
+                              <li key={idx}>{ingredient}</li>
+                            )
+                          )}
+                        </ul>
+
+                        {/* INSTRUCTIONS SELON LANGUE */}
+                        <p className="text-sm mt-3 italic">
+                          {lang === "fr"
+                            ? drink.strInstructionsFR ??
+                              drink.strInstructions
+                            : drink.strInstructions}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 ))}
-              </ul>
-
-              <p className="text-sm mt-3 italic">
-                {drink.strInstructionsFR ??
-                  drink.strInstructions}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
               </div>
             );
           })}
@@ -157,7 +187,7 @@ export default function ResultatsPage() {
         <div className="text-center mt-16">
           <Link
             href="/questionnaire"
-            className="inline-block px-8 py-4 rounded-xl bg-rose-600 text-white"
+            className="inline-block px-8 py-4 rounded-xl bg-rose-600 text-white hover:bg-rose-700 transition"
           >
             {lang === "fr"
               ? "Refaire le questionnaire"
