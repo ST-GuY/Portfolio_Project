@@ -52,13 +52,21 @@ export default function ResultatsPage() {
 
     /* ---------- COCKTAIL DISCOVERY API ---------- */
 
-    const INGREDIENT_BY_SPIRIT: Record<string, string> = {
-      "White rum": "Light rum",
-      "Dry gin": "Gin",
-      Vodka: "Vodka",
-      "Scotch whisky": "Whiskey",
-      Tequila: "Tequila",
-      Cognac: "Brandy",
+    // 🔑 INGREDIENTS ÉLARGIS (FIX WHISKY)
+    const INGREDIENTS_BY_SPIRIT: Record<string, string[]> = {
+      "White rum": ["Light rum"],
+      "Dry gin": ["Gin"],
+      Vodka: ["Vodka"],
+      Tequila: ["Tequila"],
+      Cognac: ["Brandy"],
+
+      // 👇 LE POINT CLÉ
+      "Scotch whisky": [
+        "Whiskey",
+        "Bourbon",
+        "Scotch",
+        "Rye whiskey",
+      ],
     };
 
     const pickRandom = <T,>(array: T[], count: number): T[] =>
@@ -67,9 +75,13 @@ export default function ResultatsPage() {
     recos.forEach(async (rec, index) => {
       if (!rec.bottle) return;
 
+      const ingredients =
+        INGREDIENTS_BY_SPIRIT[rec.bottle.name.en];
+      if (!ingredients?.length) return;
+
+      // 👉 on choisit UN ingrédient au hasard
       const ingredient =
-        INGREDIENT_BY_SPIRIT[rec.bottle.name.en];
-      if (!ingredient) return;
+        ingredients[Math.floor(Math.random() * ingredients.length)];
 
       try {
         // 1️⃣ Liste de cocktails par ingrédient
@@ -81,7 +93,7 @@ export default function ResultatsPage() {
         const listData = await listRes.json();
         if (!listData.drinks) return;
 
-        // 2️⃣ On en choisit 2 au hasard
+        // 2️⃣ On choisit 2 cocktails au hasard
         const selected = pickRandom(listData.drinks, 2);
 
         // 3️⃣ On récupère les recettes complètes
