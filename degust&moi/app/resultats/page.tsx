@@ -14,6 +14,7 @@ type Recommendation = {
   type: string;
   description: { fr: string; en: string };
   explanation: { fr: string; en: string };
+  classicCocktails?: string[];
   bottle?: {
     name: { fr: string; en: string };
     origin: { fr: string; en: string };
@@ -52,15 +53,12 @@ export default function ResultatsPage() {
 
     /* ---------- COCKTAIL DISCOVERY API ---------- */
 
-    // 🔑 INGREDIENTS ÉLARGIS (FIX WHISKY)
     const INGREDIENTS_BY_SPIRIT: Record<string, string[]> = {
       "White rum": ["Light rum"],
       "Dry gin": ["Gin"],
       Vodka: ["Vodka"],
       Tequila: ["Tequila"],
       Cognac: ["Brandy"],
-
-      // 👇 LE POINT CLÉ
       "Scotch whisky": [
         "Whiskey",
         "Bourbon",
@@ -79,12 +77,10 @@ export default function ResultatsPage() {
         INGREDIENTS_BY_SPIRIT[rec.bottle.name.en];
       if (!ingredients?.length) return;
 
-      // 👉 on choisit UN ingrédient au hasard
       const ingredient =
         ingredients[Math.floor(Math.random() * ingredients.length)];
 
       try {
-        // 1️⃣ Liste de cocktails par ingrédient
         const listRes = await fetch(
           `https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(
             ingredient
@@ -93,10 +89,8 @@ export default function ResultatsPage() {
         const listData = await listRes.json();
         if (!listData.drinks) return;
 
-        // 2️⃣ On choisit 2 cocktails au hasard
         const selected = pickRandom(listData.drinks, 2);
 
-        // 3️⃣ On récupère les recettes complètes
         const detailed = await Promise.all(
           selected.map((d: any) =>
             fetch(
@@ -169,56 +163,78 @@ export default function ResultatsPage() {
                 )}
 
                 {/* COCKTAILS */}
-                {drinks?.map((drink, i) => (
-                  <div
-                    key={`${drink.idDrink}-${i}`}
-                    className="border-t pt-4 space-y-3"
-                  >
-                    <h3 className="font-semibold flex items-center gap-2">
-                      🍸 {drink.strDrink}
-                      {lang === "fr" && (
-                        <span className="text-xs opacity-70">
-                          🌍 EN
-                        </span>
-                      )}
-                    </h3>
+                {drinks?.map((drink, i) => {
+                  const isClassic =
+                    rec.classicCocktails?.includes(
+                      drink.strDrink
+                    );
 
-                    <p className="text-xs text-neutral-500 italic">
-                      {lang === "fr"
-                        ? "Recette originale (EN)"
-                        : "Original recipe"}
-                    </p>
+                  return (
+                    <div
+                      key={`${drink.idDrink}-${i}`}
+                      className="border-t pt-4 space-y-3"
+                    >
+                      <h3 className="font-semibold flex items-center gap-2 flex-wrap">
+                        🍸 {drink.strDrink}
 
-                    <div className="flex gap-4 items-start">
-                      {drink.strDrinkThumb && (
-                        <Image
-                          src={drink.strDrinkThumb}
-                          alt={drink.strDrink}
-                          width={90}
-                          height={90}
-                          className="rounded-lg object-cover"
-                        />
-                      )}
+                        {isClassic ? (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800">
+                            ⭐ emblématique
+                          </span>
+                        ) : (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">
+                            ✨ découverte
+                          </span>
+                        )}
 
-                      <div>
-                        <ul className="list-disc ml-5 text-sm">
-                          {parseIngredients(drink).map(
-                            (ingredient, idx) => (
-                              <li key={idx}>{ingredient}</li>
-                            )
-                          )}
-                        </ul>
+                        {lang === "fr" && (
+                          <span className="text-xs opacity-60">
+                            🌍 EN
+                          </span>
+                        )}
+                      </h3>
 
-                        <p className="text-sm mt-3 italic">
-                          {lang === "fr"
-                            ? drink.strInstructionsFR ??
-                              drink.strInstructions
-                            : drink.strInstructions}
-                        </p>
+                      <p className="text-xs text-neutral-500 italic">
+                        {isClassic
+                          ? lang === "fr"
+                            ? "Cocktail emblématique de cet alcool"
+                            : "Iconic cocktail for this spirit"
+                          : lang === "fr"
+                          ? "Découverte proposée selon vos goûts"
+                          : "Discovery based on your tastes"}
+                      </p>
+
+                      <div className="flex gap-4 items-start">
+                        {drink.strDrinkThumb && (
+                          <Image
+                            src={drink.strDrinkThumb}
+                            alt={drink.strDrink}
+                            width={90}
+                            height={90}
+                            className="rounded-lg object-cover"
+                          />
+                        )}
+
+                        <div>
+                          <ul className="list-disc ml-5 text-sm">
+                            {parseIngredients(drink).map(
+                              (ingredient, idx) => (
+                                <li key={idx}>{ingredient}</li>
+                              )
+                            )}
+                          </ul>
+
+                          <p className="text-sm mt-3 italic">
+                            {lang === "fr"
+                              ? drink.strInstructionsFR ??
+                                drink.strInstructions
+                              : drink.strInstructions}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             );
           })}
