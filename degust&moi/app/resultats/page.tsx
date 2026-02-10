@@ -20,7 +20,6 @@ type Recommendation = {
     description: { fr: string; en: string };
     image: string;
   };
-  cocktailApiKeys?: string[];
 };
 
 type Drink = any;
@@ -51,26 +50,58 @@ export default function ResultatsPage() {
     const recos = getRecommendations(answers);
     setRecommendations(recos);
 
-    /* ---------- COCKTAIL API ---------- */
-    recos.forEach((rec, index) => {
-      if (!rec.cocktailApiKeys?.length) return;
+    /* ---------- COCKTAIL DISCOVERY API ---------- */
 
-      Promise.all(
-        rec.cocktailApiKeys.map((cocktailName) =>
-          fetch(
-            `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${encodeURIComponent(
-              cocktailName
-            )}`
+    const INGREDIENT_BY_SPIRIT: Record<string, string> = {
+      "White rum": "Light rum",
+      "Dry gin": "Gin",
+      Vodka: "Vodka",
+      "Scotch whisky": "Whiskey",
+      Tequila: "Tequila",
+      Cognac: "Brandy",
+    };
+
+    const pickRandom = <T,>(array: T[], count: number): T[] =>
+      [...array].sort(() => Math.random() - 0.5).slice(0, count);
+
+    recos.forEach(async (rec, index) => {
+      if (!rec.bottle) return;
+
+      const ingredient =
+        INGREDIENT_BY_SPIRIT[rec.bottle.name.en];
+      if (!ingredient) return;
+
+      try {
+        // 1️⃣ Liste de cocktails par ingrédient
+        const listRes = await fetch(
+          `https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(
+            ingredient
+          )}`
+        );
+        const listData = await listRes.json();
+        if (!listData.drinks) return;
+
+        // 2️⃣ On en choisit 2 au hasard
+        const selected = pickRandom(listData.drinks, 2);
+
+        // 3️⃣ On récupère les recettes complètes
+        const detailed = await Promise.all(
+          selected.map((d: any) =>
+            fetch(
+              `https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${d.idDrink}`
+            )
+              .then((res) => res.json())
+              .then((data) => data.drinks?.[0] ?? null)
           )
-            .then((res) => res.json())
-            .then((data) => data.drinks?.[0] ?? null)
-        )
-      ).then((drinks) => {
+        );
+
         setCocktails((prev) => ({
           ...prev,
-          [index]: drinks.filter(Boolean),
+          [index]: detailed.filter(Boolean),
         }));
-      });
+      } catch (e) {
+        console.error("Cocktail API error", e);
+      }
     });
 
     return () =>
@@ -131,7 +162,6 @@ export default function ResultatsPage() {
                     key={`${drink.idDrink}-${i}`}
                     className="border-t pt-4 space-y-3"
                   >
-                    {/* NOM + LANGUE */}
                     <h3 className="font-semibold flex items-center gap-2">
                       🍸 {drink.strDrink}
                       {lang === "fr" && (
@@ -141,7 +171,6 @@ export default function ResultatsPage() {
                       )}
                     </h3>
 
-                    {/* BADGE INFO */}
                     <p className="text-xs text-neutral-500 italic">
                       {lang === "fr"
                         ? "Recette originale (EN)"
@@ -168,7 +197,6 @@ export default function ResultatsPage() {
                           )}
                         </ul>
 
-                        {/* INSTRUCTIONS SELON LANGUE */}
                         <p className="text-sm mt-3 italic">
                           {lang === "fr"
                             ? drink.strInstructionsFR ??
