@@ -16,8 +16,12 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <body className="bg-neutral-100 dark:bg-black text-neutral-900 dark:text-white transition-colors">
-        <ThemeToggle />
-        <LanguageToggle />
+        
+        {/* HEADER GLOBAL */}
+        <header className="fixed top-4 right-4 z-50 flex items-center gap-4">
+          <LanguageToggle />
+          <ThemeToggle />
+        </header>
 
         {children}
       </body>

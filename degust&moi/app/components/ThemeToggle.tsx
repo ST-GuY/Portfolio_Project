@@ -32,9 +32,11 @@ export default function ThemeToggle() {
     <button
       onClick={toggleTheme}
       aria-label="Changer le thème"
-      className="fixed top-4 right-4 z-50 rounded-full p-3 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow hover:scale-105 transition"
+      className="rounded-full p-3 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow hover:scale-105 transition"
     >
       {dark ? "☀️" : "🌙"}
     </button>
   );
+
+
 }
