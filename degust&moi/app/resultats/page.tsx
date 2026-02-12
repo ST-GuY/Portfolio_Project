@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getRecommendations } from "../../src/lib/recommendation";
+import type { BaseSpirit } from "../../src/lib/recommendation";
 
 /* ================= TYPES ================= */
 
@@ -14,7 +15,7 @@ type Recommendation = {
   type: string;
   description: { fr: string; en: string };
   explanation: { fr: string; en: string };
-  classicCocktails?: string[];
+  fallbackSpirit: BaseSpirit;
   bottle?: {
     name: { fr: string; en: string };
     origin: { fr: string; en: string };
@@ -61,6 +62,7 @@ export default function ResultatsPage() {
       const updatedLang = localStorage.getItem("lang") as Lang | null;
       if (updatedLang) setLang(updatedLang);
     };
+
     window.addEventListener("languageChange", onLangChange);
 
     const storedAnswers = localStorage.getItem("degust-moi-answers");
@@ -79,56 +81,65 @@ export default function ResultatsPage() {
   /* ================= COCKTAIL DISCOVERY ================= */
 
   async function fetchCocktails(recos: Recommendation[]) {
-    const INGREDIENTS_BY_SPIRIT: Record<string, string[]> = {
-      "White rum": ["Light rum"],
-      "Dry gin": ["Gin"],
-      Vodka: ["Vodka"],
-      Tequila: ["Tequila"],
-      Cognac: ["Brandy"],
-      "Scotch whisky": ["Whiskey", "Bourbon", "Scotch", "Rye whiskey"],
+    const INGREDIENTS_BY_BASE: Record<BaseSpirit, string[]> = {
+      white_rum: ["Light rum"],
+      amber_rum: ["Dark rum"],
+      gin: ["Gin"],
+      vodka: ["Vodka"],
+      tequila: ["Tequila", "Blanco tequila", "Reposado tequila"],
+      brandy: ["Brandy"],
+      whisky: ["Whiskey", "Bourbon", "Scotch", "Rye whiskey"],
+      wine: ["Red wine"],
     };
 
     const pickRandom = <T,>(array: T[], count: number): T[] =>
       [...array].sort(() => Math.random() - 0.5).slice(0, count);
 
-    recos.forEach(async (rec, index) => {
-      if (!rec.bottle) return;
+    for (const [index, rec] of recos.entries()) {
+      const ingredients = INGREDIENTS_BY_BASE[rec.fallbackSpirit];
+      if (!ingredients) continue;
 
-      const ingredients = INGREDIENTS_BY_SPIRIT[rec.bottle.name.en];
-      if (!ingredients?.length) return;
+      let drinksFound: any[] | null = null;
 
-      const ingredient =
-        ingredients[Math.floor(Math.random() * ingredients.length)];
+      // 🔥 Essaie plusieurs variantes d’ingrédient
+      for (const ingredient of ingredients) {
+        try {
+          const res = await fetch(
+            `https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(
+              ingredient
+            )}`
+          );
 
-      try {
-        const listRes = await fetch(
-          `https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(
-            ingredient
-          )}`
-        );
-        const listData = await listRes.json();
-        if (!listData.drinks) return;
+          const data = await res.json();
 
-        const selected = pickRandom(listData.drinks, 2);
-
-        const detailed = await Promise.all(
-          selected.map((d: any) =>
-            fetch(
-              `https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${d.idDrink}`
-            )
-              .then((res) => res.json())
-              .then((data) => data.drinks?.[0] ?? null)
-          )
-        );
-
-        setCocktails((prev) => ({
-          ...prev,
-          [index]: detailed.filter(Boolean),
-        }));
-      } catch (error) {
-        console.error("Cocktail API error", error);
+          if (data.drinks) {
+            drinksFound = data.drinks;
+            break;
+          }
+        } catch {
+          continue;
+        }
       }
-    });
+
+      if (!drinksFound) continue;
+
+      const selected = pickRandom(drinksFound, 2);
+
+      const detailed = await Promise.all(
+        selected.map((d: any) =>
+          fetch(
+            `https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${d.idDrink}`
+          )
+            .then((res) => res.json())
+            .then((data) => data.drinks?.[0] ?? null)
+        )
+      );
+
+      setCocktails((prev) => ({
+        ...prev,
+        [index]: detailed.filter(Boolean),
+      }));
+    }
   }
 
   /* ================= FAVORITE TOGGLE ================= */
@@ -262,12 +273,6 @@ export default function ResultatsPage() {
                         {isFavorite
                           ? "Retirer des favoris"
                           : "Ajouter aux favoris"}
-
-                        {lastAdded === drink.idDrink && (
-                          <span className="absolute left-0 text-rose-500 animate-float-heart">
-                            ❤️
-                          </span>
-                        )}
                       </button>
 
                       <div className="flex gap-4 items-start">
@@ -306,7 +311,6 @@ export default function ResultatsPage() {
           })}
         </div>
 
-        {/* TOAST */}
         {lastAdded && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-neutral-900 text-white px-6 py-3 rounded-xl shadow-lg animate-fade-in">
             ❤️ Ajouté aux favoris
