@@ -15,15 +15,36 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" suppressHydrationWarning>
-      <body className="bg-neutral-100 dark:bg-black text-neutral-900 dark:text-white transition-colors">
-        
-        {/* HEADER GLOBAL */}
-        <header className="fixed top-4 right-4 z-50 flex items-center gap-4">
-          <LanguageToggle />
-          <ThemeToggle />
-        </header>
+      <body
+        className="
+          min-h-screen
+          bg-cover
+          bg-center
+          bg-fixed
+          transition-colors
+        "
+        style={{
+          backgroundImage: "url('/images/background.png')",
+        }}
+      >
+        {/* OVERLAY LÉGER (pas de blur ici) */}
+        <div
+          className="
+            min-h-screen
+            bg-gradient-to-br
+            from-white/50 via-white/30 to-white/50
+            dark:from-black/40 dark:via-black/20 dark:to-black/40
+            transition-colors
+          "
+        >
+          {/* HEADER GLOBAL */}
+          <header className="fixed top-4 right-4 z-50 flex items-center gap-4">
+            <LanguageToggle />
+            <ThemeToggle />
+          </header>
 
-        {children}
+          {children}
+        </div>
       </body>
     </html>
   );
