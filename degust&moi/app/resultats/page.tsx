@@ -25,15 +25,35 @@ type Recommendation = {
 
 type Drink = any;
 
+/* ================= FAVORITES STORAGE ================= */
+
+const FAVORITES_KEY = "degust-moi-favorites";
+
+function getFavorites(): Drink[] {
+  if (typeof window === "undefined") return [];
+  return JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]");
+}
+
+function saveFavorites(favorites: Drink[]) {
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+}
+
 /* ================= COMPONENT ================= */
 
 export default function ResultatsPage() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [cocktails, setCocktails] = useState<Record<number, Drink[]>>({});
+  const [favorites, setFavorites] = useState<Drink[]>([]);
   const [lang, setLang] = useState<Lang>("fr");
 
+  const [lastAdded, setLastAdded] = useState<string | null>(null);
+  const [badgeAnimate, setBadgeAnimate] = useState(false);
+
+  /* ================= INITIAL LOAD ================= */
+
   useEffect(() => {
-    /* ---------- LANG ---------- */
+    setFavorites(getFavorites());
+
     const storedLang = localStorage.getItem("lang") as Lang | null;
     if (storedLang) setLang(storedLang);
 
@@ -43,7 +63,6 @@ export default function ResultatsPage() {
     };
     window.addEventListener("languageChange", onLangChange);
 
-    /* ---------- ANSWERS / RECO ---------- */
     const storedAnswers = localStorage.getItem("degust-moi-answers");
     if (!storedAnswers) return;
 
@@ -51,20 +70,22 @@ export default function ResultatsPage() {
     const recos = getRecommendations(answers);
     setRecommendations(recos);
 
-    /* ---------- COCKTAIL DISCOVERY API ---------- */
+    fetchCocktails(recos);
 
+    return () =>
+      window.removeEventListener("languageChange", onLangChange);
+  }, []);
+
+  /* ================= COCKTAIL DISCOVERY ================= */
+
+  async function fetchCocktails(recos: Recommendation[]) {
     const INGREDIENTS_BY_SPIRIT: Record<string, string[]> = {
       "White rum": ["Light rum"],
       "Dry gin": ["Gin"],
       Vodka: ["Vodka"],
       Tequila: ["Tequila"],
       Cognac: ["Brandy"],
-      "Scotch whisky": [
-        "Whiskey",
-        "Bourbon",
-        "Scotch",
-        "Rye whiskey",
-      ],
+      "Scotch whisky": ["Whiskey", "Bourbon", "Scotch", "Rye whiskey"],
     };
 
     const pickRandom = <T,>(array: T[], count: number): T[] =>
@@ -73,8 +94,7 @@ export default function ResultatsPage() {
     recos.forEach(async (rec, index) => {
       if (!rec.bottle) return;
 
-      const ingredients =
-        INGREDIENTS_BY_SPIRIT[rec.bottle.name.en];
+      const ingredients = INGREDIENTS_BY_SPIRIT[rec.bottle.name.en];
       if (!ingredients?.length) return;
 
       const ingredient =
@@ -105,23 +125,67 @@ export default function ResultatsPage() {
           ...prev,
           [index]: detailed.filter(Boolean),
         }));
-      } catch (e) {
-        console.error("Cocktail API error", e);
+      } catch (error) {
+        console.error("Cocktail API error", error);
       }
     });
+  }
 
-    return () =>
-      window.removeEventListener("languageChange", onLangChange);
-  }, []);
+  /* ================= FAVORITE TOGGLE ================= */
+
+  function toggleFavorite(drink: Drink) {
+    const exists = favorites.some((f) => f.idDrink === drink.idDrink);
+
+    let updated;
+
+    if (exists) {
+      updated = favorites.filter((f) => f.idDrink !== drink.idDrink);
+    } else {
+      updated = [...favorites, drink];
+
+      setLastAdded(drink.idDrink);
+      setBadgeAnimate(true);
+
+      setTimeout(() => {
+        setLastAdded(null);
+        setBadgeAnimate(false);
+      }, 800);
+    }
+
+    setFavorites(updated);
+    saveFavorites(updated);
+  }
+
+  /* ================= RENDER ================= */
 
   return (
     <main className="min-h-screen bg-neutral-50 dark:bg-neutral-950 px-4 py-12">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-12">
-          {lang === "fr"
-            ? "Vos recommandations"
-            : "Your recommendations"}
-        </h1>
+      <div className="max-w-4xl mx-auto relative">
+
+        {/* HEADER */}
+        <div className="flex justify-between items-center mb-12">
+          <h1 className="text-4xl font-bold">
+            {lang === "fr"
+              ? "Vos recommandations"
+              : "Your recommendations"}
+          </h1>
+
+          <Link
+            href="/favoris"
+            className="relative bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 px-4 py-2 rounded-xl shadow hover:shadow-md transition flex items-center gap-2"
+          >
+            ❤️ Favoris
+            {favorites.length > 0 && (
+              <span
+                className={`absolute -top-2 -right-2 bg-rose-600 text-white text-xs px-2 py-0.5 rounded-full ${
+                  badgeAnimate ? "animate-badge" : ""
+                }`}
+              >
+                {favorites.length}
+              </span>
+            )}
+          </Link>
+        </div>
 
         <div className="space-y-12">
           {recommendations.map((rec, index) => {
@@ -164,45 +228,47 @@ export default function ResultatsPage() {
 
                 {/* COCKTAILS */}
                 {drinks?.map((drink, i) => {
-                  const isClassic =
-                    rec.classicCocktails?.includes(
-                      drink.strDrink
-                    );
+                  const isFavorite = favorites.some(
+                    (f) => f.idDrink === drink.idDrink
+                  );
 
                   return (
                     <div
                       key={`${drink.idDrink}-${i}`}
-                      className="border-t pt-4 space-y-3"
+                      className={`border-t pt-4 space-y-3 transition-all ${
+                        lastAdded === drink.idDrink
+                          ? "animate-card-pulse"
+                          : ""
+                      }`}
                     >
-                      <h3 className="font-semibold flex items-center gap-2 flex-wrap">
+                      <h3 className="font-semibold">
                         🍸 {drink.strDrink}
-
-                        {isClassic ? (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800">
-                            ⭐ emblématique
-                          </span>
-                        ) : (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">
-                            ✨ découverte
-                          </span>
-                        )}
-
-                        {lang === "fr" && (
-                          <span className="text-xs opacity-60">
-                            🌍 EN
-                          </span>
-                        )}
                       </h3>
 
-                      <p className="text-xs text-neutral-500 italic">
-                        {isClassic
-                          ? lang === "fr"
-                            ? "Cocktail emblématique de cet alcool"
-                            : "Iconic cocktail for this spirit"
-                          : lang === "fr"
-                          ? "Découverte proposée selon vos goûts"
-                          : "Discovery based on your tastes"}
-                      </p>
+                      <button
+                        onClick={() => toggleFavorite(drink)}
+                        className="relative text-sm flex items-center gap-2"
+                      >
+                        <span
+                          className={`transition-all ${
+                            lastAdded === drink.idDrink
+                              ? "animate-heart-pop"
+                              : ""
+                          }`}
+                        >
+                          {isFavorite ? "❤️" : "🤍"}
+                        </span>
+
+                        {isFavorite
+                          ? "Retirer des favoris"
+                          : "Ajouter aux favoris"}
+
+                        {lastAdded === drink.idDrink && (
+                          <span className="absolute left-0 text-rose-500 animate-float-heart">
+                            ❤️
+                          </span>
+                        )}
+                      </button>
 
                       <div className="flex gap-4 items-start">
                         {drink.strDrinkThumb && (
@@ -240,6 +306,13 @@ export default function ResultatsPage() {
           })}
         </div>
 
+        {/* TOAST */}
+        {lastAdded && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-neutral-900 text-white px-6 py-3 rounded-xl shadow-lg animate-fade-in">
+            ❤️ Ajouté aux favoris
+          </div>
+        )}
+
         <div className="text-center mt-16">
           <Link
             href="/questionnaire"
@@ -265,9 +338,7 @@ function parseIngredients(drink: any): string[] {
     const measure = drink[`strMeasure${i}`];
 
     if (name) {
-      ingredients.push(
-        measure ? `${name} – ${measure}` : name
-      );
+      ingredients.push(measure ? `${name} – ${measure}` : name);
     }
   }
 
