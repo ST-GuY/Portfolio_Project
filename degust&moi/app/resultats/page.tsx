@@ -101,7 +101,6 @@ export default function ResultatsPage() {
 
       let drinksFound: any[] | null = null;
 
-      // 🔥 Essaie plusieurs variantes d’ingrédient
       for (const ingredient of ingredients) {
         try {
           const res = await fetch(
@@ -170,12 +169,22 @@ export default function ResultatsPage() {
   /* ================= RENDER ================= */
 
   return (
-    <main className="min-h-screen bg-neutral-50 dark:bg-neutral-950 px-4 py-12">
+    <main
+      className="
+        min-h-screen
+        px-4
+        py-12
+        bg-gradient-to-br
+        from-white/40 via-white/20 to-white/40
+        dark:from-black/25 dark:via-black/10 dark:to-black/25
+        backdrop-blur-[2px]
+      "
+    >
       <div className="max-w-4xl mx-auto relative">
 
         {/* HEADER */}
         <div className="flex justify-between items-center mb-12">
-          <h1 className="text-4xl font-bold">
+          <h1 className="text-4xl font-bold tracking-tight">
             {lang === "fr"
               ? "Vos recommandations"
               : "Your recommendations"}
@@ -183,7 +192,16 @@ export default function ResultatsPage() {
 
           <Link
             href="/favoris"
-            className="relative bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 px-4 py-2 rounded-xl shadow hover:shadow-md transition flex items-center gap-2"
+            className="
+              relative
+              bg-white/80 dark:bg-white/5
+              backdrop-blur-md
+              border border-white/20 dark:border-white/10
+              px-4 py-2 rounded-xl
+              shadow-lg
+              hover:scale-105 transition
+              flex items-center gap-2
+            "
           >
             ❤️ Favoris
             {favorites.length > 0 && (
@@ -205,39 +223,44 @@ export default function ResultatsPage() {
             return (
               <div
                 key={index}
-                className="rounded-2xl p-6 shadow-lg bg-white dark:bg-neutral-900 space-y-6"
+                className="
+                  rounded-2xl
+                  p-8
+                  shadow-2xl
+                  bg-white/80 dark:bg-white/5
+                  backdrop-blur-md
+                  border border-white/20 dark:border-white/10
+                  space-y-8
+                "
               >
-                {/* ALCOOL */}
                 <div>
                   <h2 className="text-2xl font-semibold">
                     {rec.name[lang]}
                   </h2>
-                  <p className="text-neutral-600 dark:text-neutral-400">
+                  <p className="text-neutral-700 dark:text-neutral-300 mt-2">
                     {rec.description[lang]}
                   </p>
                 </div>
 
-                {/* BOTTLE */}
                 {rec.bottle && (
-                  <div className="flex gap-4 items-center">
+                  <div className="flex gap-6 items-center">
                     <Image
                       src={rec.bottle.image}
                       alt={rec.bottle.name[lang]}
-                      width={80}
-                      height={200}
+                      width={90}
+                      height={220}
                     />
                     <div>
-                      <p className="font-medium">
+                      <p className="font-medium text-lg">
                         {rec.bottle.name[lang]}
                       </p>
-                      <p className="text-sm text-neutral-500">
+                      <p className="text-sm text-neutral-600 dark:text-neutral-400">
                         {rec.bottle.origin[lang]}
                       </p>
                     </div>
                   </div>
                 )}
 
-                {/* COCKTAILS */}
                 {drinks?.map((drink, i) => {
                   const isFavorite = favorites.some(
                     (f) => f.idDrink === drink.idDrink
@@ -246,48 +269,35 @@ export default function ResultatsPage() {
                   return (
                     <div
                       key={`${drink.idDrink}-${i}`}
-                      className={`border-t pt-4 space-y-3 transition-all ${
-                        lastAdded === drink.idDrink
-                          ? "animate-card-pulse"
-                          : ""
-                      }`}
+                      className="pt-6 border-t border-white/20 dark:border-white/10 space-y-4"
                     >
-                      <h3 className="font-semibold">
+                      <h3 className="font-semibold text-lg">
                         🍸 {drink.strDrink}
                       </h3>
 
                       <button
                         onClick={() => toggleFavorite(drink)}
-                        className="relative text-sm flex items-center gap-2"
+                        className="text-sm flex items-center gap-2 hover:opacity-80 transition"
                       >
-                        <span
-                          className={`transition-all ${
-                            lastAdded === drink.idDrink
-                              ? "animate-heart-pop"
-                              : ""
-                          }`}
-                        >
-                          {isFavorite ? "❤️" : "🤍"}
-                        </span>
-
+                        {isFavorite ? "❤️" : "🤍"}
                         {isFavorite
                           ? "Retirer des favoris"
                           : "Ajouter aux favoris"}
                       </button>
 
-                      <div className="flex gap-4 items-start">
+                      <div className="flex gap-6 items-start">
                         {drink.strDrinkThumb && (
                           <Image
                             src={drink.strDrinkThumb}
                             alt={drink.strDrink}
-                            width={90}
-                            height={90}
-                            className="rounded-lg object-cover"
+                            width={100}
+                            height={100}
+                            className="rounded-xl object-cover shadow-md"
                           />
                         )}
 
                         <div>
-                          <ul className="list-disc ml-5 text-sm">
+                          <ul className="list-disc ml-5 text-sm text-neutral-700 dark:text-neutral-300">
                             {parseIngredients(drink).map(
                               (ingredient, idx) => (
                                 <li key={idx}>{ingredient}</li>
@@ -295,7 +305,7 @@ export default function ResultatsPage() {
                             )}
                           </ul>
 
-                          <p className="text-sm mt-3 italic">
+                          <p className="text-sm mt-4 italic text-neutral-600 dark:text-neutral-400">
                             {lang === "fr"
                               ? drink.strInstructionsFR ??
                                 drink.strInstructions
@@ -311,16 +321,10 @@ export default function ResultatsPage() {
           })}
         </div>
 
-        {lastAdded && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-neutral-900 text-white px-6 py-3 rounded-xl shadow-lg animate-fade-in">
-            ❤️ Ajouté aux favoris
-          </div>
-        )}
-
         <div className="text-center mt-16">
           <Link
             href="/questionnaire"
-            className="inline-block px-8 py-4 rounded-xl bg-rose-600 text-white hover:bg-rose-700 transition"
+            className="inline-block px-8 py-4 rounded-xl bg-rose-600 text-white hover:bg-rose-700 shadow-xl hover:scale-105 transition"
           >
             {lang === "fr"
               ? "Refaire le questionnaire"

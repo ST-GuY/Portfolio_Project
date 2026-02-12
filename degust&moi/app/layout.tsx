@@ -21,30 +21,21 @@ export default function RootLayout({
           bg-cover
           bg-center
           bg-fixed
+          text-neutral-900
+          dark:text-white
           transition-colors
         "
         style={{
           backgroundImage: "url('/images/background.png')",
         }}
       >
-        {/* OVERLAY LÉGER (pas de blur ici) */}
-        <div
-          className="
-            min-h-screen
-            bg-gradient-to-br
-            from-white/50 via-white/30 to-white/50
-            dark:from-black/40 dark:via-black/20 dark:to-black/40
-            transition-colors
-          "
-        >
-          {/* HEADER GLOBAL */}
-          <header className="fixed top-4 right-4 z-50 flex items-center gap-4">
-            <LanguageToggle />
-            <ThemeToggle />
-          </header>
+        {/* HEADER GLOBAL */}
+        <header className="fixed top-4 right-4 z-50 flex items-center gap-4">
+          <LanguageToggle />
+          <ThemeToggle />
+        </header>
 
-          {children}
-        </div>
+        {children}
       </body>
     </html>
   );
