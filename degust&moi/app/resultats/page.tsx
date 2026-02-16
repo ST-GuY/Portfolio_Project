@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { getRecommendations } from "../../src/lib/recommendation";
 import type { BaseSpirit } from "../../src/lib/recommendation";
 
@@ -26,8 +25,6 @@ type Recommendation = {
 
 type Drink = any;
 
-/* ================= FAVORITES STORAGE ================= */
-
 const FAVORITES_KEY = "degust-moi-favorites";
 
 function getFavorites(): Drink[] {
@@ -39,18 +36,12 @@ function saveFavorites(favorites: Drink[]) {
   localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
 }
 
-/* ================= COMPONENT ================= */
-
 export default function ResultatsPage() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [cocktails, setCocktails] = useState<Record<number, Drink[]>>({});
   const [favorites, setFavorites] = useState<Drink[]>([]);
   const [lang, setLang] = useState<Lang>("fr");
-
   const [lastAdded, setLastAdded] = useState<string | null>(null);
-  const [badgeAnimate, setBadgeAnimate] = useState(false);
-
-  /* ================= INITIAL LOAD ================= */
 
   useEffect(() => {
     setFavorites(getFavorites());
@@ -74,11 +65,10 @@ export default function ResultatsPage() {
 
     fetchCocktails(recos);
 
-    return () =>
+    return () => {
       window.removeEventListener("languageChange", onLangChange);
+    };
   }, []);
-
-  /* ================= COCKTAIL DISCOVERY ================= */
 
   async function fetchCocktails(recos: Recommendation[]) {
     const INGREDIENTS_BY_BASE: Record<BaseSpirit, string[]> = {
@@ -91,9 +81,6 @@ export default function ResultatsPage() {
       whisky: ["Whiskey", "Bourbon", "Scotch", "Rye whiskey"],
       wine: ["Red wine"],
     };
-
-    const pickRandom = <T,>(array: T[], count: number): T[] =>
-      [...array].sort(() => Math.random() - 0.5).slice(0, count);
 
     for (const [index, rec] of recos.entries()) {
       const ingredients = INGREDIENTS_BY_BASE[rec.fallbackSpirit];
@@ -108,9 +95,7 @@ export default function ResultatsPage() {
               ingredient
             )}`
           );
-
           const data = await res.json();
-
           if (data.drinks) {
             drinksFound = data.drinks;
             break;
@@ -122,7 +107,7 @@ export default function ResultatsPage() {
 
       if (!drinksFound) continue;
 
-      const selected = pickRandom(drinksFound, 2);
+      const selected = drinksFound.sort(() => 0.5 - Math.random()).slice(0, 2);
 
       const detailed = await Promise.all(
         selected.map((d: any) =>
@@ -141,214 +126,166 @@ export default function ResultatsPage() {
     }
   }
 
-  /* ================= FAVORITE TOGGLE ================= */
-
   function toggleFavorite(drink: Drink) {
     const exists = favorites.some((f) => f.idDrink === drink.idDrink);
-
     let updated;
 
     if (exists) {
       updated = favorites.filter((f) => f.idDrink !== drink.idDrink);
     } else {
       updated = [...favorites, drink];
-
-      setLastAdded(drink.idDrink);
-      setBadgeAnimate(true);
-
+      setLastAdded(null);
       setTimeout(() => {
-        setLastAdded(null);
-        setBadgeAnimate(false);
-      }, 800);
+        setLastAdded(drink.idDrink);
+        setTimeout(() => setLastAdded(null), 600);
+      }, 10);
     }
 
     setFavorites(updated);
     saveFavorites(updated);
   }
 
-  /* ================= RENDER ================= */
-
   return (
-    <main
-      className="
-        min-h-screen
-        px-4
-        py-12
-        bg-gradient-to-br
-        from-white/40 via-white/20 to-white/40
-        dark:from-black/25 dark:via-black/10 dark:to-black/25
-        backdrop-blur-[2px]
-      "
-    >
-      <div className="max-w-4xl mx-auto relative">
+    <main className="min-h-screen px-4 py-12 bg-gradient-to-br from-white/40 via-white/20 to-white/40 dark:from-black/25 dark:via-black/10 dark:to-black/25 backdrop-blur-[2px]">
+      <div className="max-w-4xl mx-auto space-y-12">
 
-        {/* HEADER */}
-        <div className="flex justify-between items-center mb-12">
-          <h1 className="text-4xl font-bold tracking-tight">
-            {lang === "fr"
-              ? "Vos recommandations"
-              : "Your recommendations"}
-          </h1>
+        <h1 className="text-4xl font-bold tracking-tight">
+          {lang === "fr" ? "Vos recommandations" : "Your recommendations"}
+        </h1>
 
-          <Link
-            href="/favoris"
-            className="
-              relative
-              bg-white/80 dark:bg-white/5
-              backdrop-blur-md
-              border border-white/20 dark:border-white/10
-              px-4 py-2 rounded-xl
-              shadow-lg
-              hover:scale-105 transition
-              flex items-center gap-2
-            "
-          >
-            ❤️ Favoris
-            {favorites.length > 0 && (
-              <span
-                className={`absolute -top-2 -right-2 bg-rose-600 text-white text-xs px-2 py-0.5 rounded-full ${
-                  badgeAnimate ? "animate-badge" : ""
-                }`}
-              >
-                {favorites.length}
-              </span>
-            )}
-          </Link>
-        </div>
+        {recommendations.map((rec, index) => {
+          const drinks = cocktails[index];
 
-        <div className="space-y-12">
-          {recommendations.map((rec, index) => {
-            const drinks = cocktails[index];
+          return (
+            <div
+              key={index}
+              className="rounded-2xl p-8 shadow-2xl bg-white/80 dark:bg-white/5 backdrop-blur-md border border-white/20 dark:border-white/10 space-y-8"
+            >
+              <div>
+                <h2 className="text-2xl font-semibold">
+                  {rec.name[lang]}
+                </h2>
+                <p className="text-neutral-700 dark:text-neutral-300 mt-2">
+                  {rec.description[lang]}
+                </p>
+              </div>
 
-            return (
-              <div
-                key={index}
-                className="
-                  rounded-2xl
-                  p-8
-                  shadow-2xl
-                  bg-white/80 dark:bg-white/5
-                  backdrop-blur-md
-                  border border-white/20 dark:border-white/10
-                  space-y-8
-                "
-              >
-                <div>
-                  <h2 className="text-2xl font-semibold">
-                    {rec.name[lang]}
-                  </h2>
-                  <p className="text-neutral-700 dark:text-neutral-300 mt-2">
-                    {rec.description[lang]}
-                  </p>
-                </div>
-
-                {rec.bottle && (
-                  <div className="flex gap-6 items-center">
-                    <Image
-                      src={rec.bottle.image}
-                      alt={rec.bottle.name[lang]}
-                      width={90}
-                      height={220}
-                    />
-                    <div>
-                      <p className="font-medium text-lg">
-                        {rec.bottle.name[lang]}
-                      </p>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                        {rec.bottle.origin[lang]}
-                      </p>
-                    </div>
+              {rec.bottle && (
+                <div className="flex gap-6 items-center bg-white/40 dark:bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                  <Image
+                    src={rec.bottle.image}
+                    alt={rec.bottle.name[lang]}
+                    width={90}
+                    height={220}
+                    className="drop-shadow-lg"
+                  />
+                  <div>
+                    <p className="font-medium text-lg">
+                      {rec.bottle.name[lang]}
+                    </p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                      {rec.bottle.origin[lang]}
+                    </p>
                   </div>
-                )}
+                </div>
+              )}
 
-                {drinks?.map((drink, i) => {
-                  const isFavorite = favorites.some(
-                    (f) => f.idDrink === drink.idDrink
-                  );
+              {drinks?.map((drink, i) => {
+                const isFavorite = favorites.some(
+                  (f) => f.idDrink === drink.idDrink
+                );
 
-                  return (
-                    <div
-                      key={`${drink.idDrink}-${i}`}
-                      className="pt-6 border-t border-white/20 dark:border-white/10 space-y-4"
+                const hasFrench = !!drink.strInstructionsFR;
+
+                return (
+                  <div
+                    key={`${drink.idDrink}-${i}`}
+                    className={`pt-6 border-t border-white/20 dark:border-white/10 space-y-4 transition ${
+                      lastAdded === drink.idDrink
+                        ? "animate-card-pulse"
+                        : ""
+                    }`}
+                  >
+                    {/* Titre + Badges */}
+                    <h3 className="font-semibold text-lg flex items-center gap-3">
+                      🍸 {drink.strDrink}
+
+                      <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300">
+                        🌍 {hasFrench ? "FR" : "EN"}
+                      </span>
+                    </h3>
+
+                    <button
+                      onClick={() => toggleFavorite(drink)}
+                      className="text-sm flex items-center gap-2"
                     >
-                      <h3 className="font-semibold text-lg">
-                        🍸 {drink.strDrink}
-                      </h3>
-
-                      <button
-                        onClick={() => toggleFavorite(drink)}
-                        className="text-sm flex items-center gap-2 hover:opacity-80 transition"
+                      <span
+                        className={`${
+                          lastAdded === drink.idDrink
+                            ? "animate-heart-pop"
+                            : ""
+                        }`}
                       >
                         {isFavorite ? "❤️" : "🤍"}
-                        {isFavorite
-                          ? "Retirer des favoris"
-                          : "Ajouter aux favoris"}
-                      </button>
+                      </span>
 
-                      <div className="flex gap-6 items-start">
-                        {drink.strDrinkThumb && (
-                          <Image
-                            src={drink.strDrinkThumb}
-                            alt={drink.strDrink}
-                            width={100}
-                            height={100}
-                            className="rounded-xl object-cover shadow-md"
-                          />
-                        )}
+                      {isFavorite
+                        ? "Retirer des favoris"
+                        : "Ajouter aux favoris"}
+                    </button>
 
-                        <div>
-                          <ul className="list-disc ml-5 text-sm text-neutral-700 dark:text-neutral-300">
-                            {parseIngredients(drink).map(
-                              (ingredient, idx) => (
-                                <li key={idx}>{ingredient}</li>
-                              )
-                            )}
-                          </ul>
+                    <div className="flex gap-6 items-start">
+                      {drink.strDrinkThumb && (
+                        <Image
+                          src={drink.strDrinkThumb}
+                          alt={drink.strDrink}
+                          width={100}
+                          height={100}
+                          className="rounded-xl object-cover shadow-md"
+                        />
+                      )}
 
-                          <p className="text-sm mt-4 italic text-neutral-600 dark:text-neutral-400">
-                            {lang === "fr"
-                              ? drink.strInstructionsFR ??
-                                drink.strInstructions
-                              : drink.strInstructions}
-                          </p>
-                        </div>
+                      <div>
+                        <ul className="list-disc ml-5 text-sm text-neutral-700 dark:text-neutral-300">
+                          {parseIngredients(drink).map(
+                            (ingredient, idx) => (
+                              <li key={idx}>{ingredient}</li>
+                            )
+                          )}
+                        </ul>
+
+                        <p className="text-sm mt-4 italic text-neutral-600 dark:text-neutral-400">
+                          {lang === "fr" && hasFrench
+                            ? drink.strInstructionsFR
+                            : drink.strInstructions}
+                        </p>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
 
-        <div className="text-center mt-16">
-          <Link
-            href="/questionnaire"
-            className="inline-block px-8 py-4 rounded-xl bg-rose-600 text-white hover:bg-rose-700 shadow-xl hover:scale-105 transition"
-          >
-            {lang === "fr"
-              ? "Refaire le questionnaire"
-              : "Restart questionnaire"}
-          </Link>
-        </div>
+        {lastAdded && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-neutral-900/90 text-white px-6 py-3 rounded-xl shadow-lg animate-fade-in">
+            ❤️ Ajouté aux favoris
+          </div>
+        )}
       </div>
     </main>
   );
 }
 
-/* ================= HELPERS ================= */
-
 function parseIngredients(drink: any): string[] {
   const ingredients: string[] = [];
-
   for (let i = 1; i <= 15; i++) {
     const name = drink[`strIngredient${i}`];
     const measure = drink[`strMeasure${i}`];
-
     if (name) {
       ingredients.push(measure ? `${name} – ${measure}` : name);
     }
   }
-
   return ingredients;
 }
