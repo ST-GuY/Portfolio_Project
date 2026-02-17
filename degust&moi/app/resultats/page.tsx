@@ -154,15 +154,6 @@ export default function ResultatsPage() {
           {lang === "fr" ? "Vos recommandations" : "Your recommendations"}
         </h1>
 
-        <div className="flex justify-end">
-          <Link
-            href="/favoris"
-            className="inline-block px-4 py-2 rounded-xl bg-white/80 dark:bg-white/10 backdrop-blur-md border border-white/20 dark:border-white/10 shadow hover:scale-105 transition"
-          >
-            ❤️ {lang === "fr" ? "Mes favoris" : "My favorites"}
-          </Link>
-        </div>
-
         {recommendations.map((rec, index) => {
           const drinks = cocktails[index];
 
