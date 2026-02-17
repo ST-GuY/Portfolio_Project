@@ -144,6 +144,7 @@ export default function ResultatsPage() {
 
     setFavorites(updated);
     saveFavorites(updated);
+    window.dispatchEvent(new Event("favoritesUpdated"));
   }
 
   return (
