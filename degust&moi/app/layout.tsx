@@ -1,7 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import Link from "next/link";
-import ThemeToggle from "./components/ThemeToggle";
 import LanguageToggle from "./components/LanguageToggle";
 
 export const metadata: Metadata = {
@@ -15,16 +14,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html lang="fr" className="dark">
       <body
         className="
           min-h-screen
           bg-cover
           bg-center
           bg-fixed
-          text-neutral-900
-          dark:text-white
-          transition-colors
+          text-white
         "
         style={{
           backgroundImage: "url('/images/background.png')",
@@ -39,10 +36,9 @@ export default function RootLayout({
             className="
               px-4 py-2
               rounded-xl
-              bg-white/80
-              dark:bg-white/10
+              bg-white/10
               backdrop-blur-md
-              border border-white/20 dark:border-white/10
+              border border-white/10
               shadow
               hover:scale-105
               transition
@@ -52,7 +48,6 @@ export default function RootLayout({
           </Link>
 
           <LanguageToggle />
-          <ThemeToggle />
         </header>
 
         {children}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import CustomSelect from "../components/CustomSelect";
 
 type Lang = "fr" | "en";
 
@@ -73,6 +74,11 @@ export default function QuestionnairePage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (!answers.sweetness || !answers.intensity || !answers.context) {
+      return;
+    }
+
     localStorage.setItem("degust-moi-answers", JSON.stringify(answers));
     router.push("/resultats");
   }
@@ -86,49 +92,50 @@ export default function QuestionnairePage() {
           {t.title}
         </h1>
 
-        <p className="text-neutral-700 dark:text-neutral-300 mb-8 text-center text-sm">
+        <p className="text-neutral-300 mb-8 text-center text-sm">
           {t.subtitle}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <select
-            required
-            className="w-full p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700"
-            onChange={(e) =>
-              setAnswers({ ...answers, sweetness: e.target.value })
-            }
-          >
-            <option value="">{t.taste}</option>
-            <option value="sweet">{t.options.sweet}</option>
-            <option value="dry">{t.options.dry}</option>
-            <option value="fruity">{t.options.fruity}</option>
-          </select>
 
-          <select
-            required
-            className="w-full p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700"
-            onChange={(e) =>
-              setAnswers({ ...answers, intensity: e.target.value })
+          {/* Taste */}
+          <CustomSelect
+            placeholder={t.taste}
+            options={[
+              { value: "sweet", label: t.options.sweet },
+              { value: "dry", label: t.options.dry },
+              { value: "fruity", label: t.options.fruity },
+            ]}
+            onChange={(value) =>
+              setAnswers({ ...answers, sweetness: value })
             }
-          >
-            <option value="">{t.intensity}</option>
-            <option value="light">{t.options.light}</option>
-            <option value="medium">{t.options.medium}</option>
-            <option value="strong">{t.options.strong}</option>
-          </select>
+          />
 
-          <select
-            required
-            className="w-full p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700"
-            onChange={(e) =>
-              setAnswers({ ...answers, context: e.target.value })
+          {/* Intensity */}
+          <CustomSelect
+            placeholder={t.intensity}
+            options={[
+              { value: "light", label: t.options.light },
+              { value: "medium", label: t.options.medium },
+              { value: "strong", label: t.options.strong },
+            ]}
+            onChange={(value) =>
+              setAnswers({ ...answers, intensity: value })
             }
-          >
-            <option value="">{t.context}</option>
-            <option value="calm">{t.options.calm}</option>
-            <option value="tasting">{t.options.tasting}</option>
-            <option value="aperitif">{t.options.aperitif}</option>
-          </select>
+          />
+
+          {/* Context */}
+          <CustomSelect
+            placeholder={t.context}
+            options={[
+              { value: "calm", label: t.options.calm },
+              { value: "tasting", label: t.options.tasting },
+              { value: "aperitif", label: t.options.aperitif },
+            ]}
+            onChange={(value) =>
+              setAnswers({ ...answers, context: value })
+            }
+          />
 
           <button
             type="submit"
