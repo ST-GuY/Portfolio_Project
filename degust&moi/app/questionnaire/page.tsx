@@ -81,17 +81,16 @@ export default function QuestionnairePage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg p-8 w-full max-w-md">
+      <div className="glass-card w-full max-w-md">
         <h1 className="text-3xl font-bold mb-2 text-center">
           {t.title}
         </h1>
 
-        <p className="text-neutral-600 dark:text-neutral-400 mb-8 text-center text-sm">
+        <p className="text-neutral-700 dark:text-neutral-300 mb-8 text-center text-sm">
           {t.subtitle}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Taste */}
           <select
             required
             className="w-full p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700"
@@ -105,7 +104,6 @@ export default function QuestionnairePage() {
             <option value="fruity">{t.options.fruity}</option>
           </select>
 
-          {/* Intensity */}
           <select
             required
             className="w-full p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700"
@@ -119,7 +117,6 @@ export default function QuestionnairePage() {
             <option value="strong">{t.options.strong}</option>
           </select>
 
-          {/* Context */}
           <select
             required
             className="w-full p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700"

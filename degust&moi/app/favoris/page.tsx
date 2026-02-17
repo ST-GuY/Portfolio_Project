@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 /* ================= TYPES ================= */
 
@@ -14,16 +15,11 @@ const FAVORITES_KEY = "degust-moi-favorites";
 
 function getFavorites(): Drink[] {
   if (typeof window === "undefined") return [];
-  return JSON.parse(
-    localStorage.getItem(FAVORITES_KEY) || "[]"
-  );
+  return JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]");
 }
 
 function saveFavorites(favorites: Drink[]) {
-  localStorage.setItem(
-    FAVORITES_KEY,
-    JSON.stringify(favorites)
-  );
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
 }
 
 function parseIngredients(drink: Drink): string[] {
@@ -34,9 +30,7 @@ function parseIngredients(drink: Drink): string[] {
     const measure = drink[`strMeasure${i}`];
 
     if (name) {
-      ingredients.push(
-        measure ? `${name} – ${measure}` : name
-      );
+      ingredients.push(measure ? `${name} – ${measure}` : name);
     }
   }
 
@@ -47,36 +41,35 @@ function parseIngredients(drink: Drink): string[] {
 
 export default function FavorisPage() {
   const [favorites, setFavorites] = useState<Drink[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     setFavorites(getFavorites());
   }, []);
 
   function removeFavorite(id: string) {
-    const updated = favorites.filter(
-      (f) => f.idDrink !== id
-    );
-
+    const updated = favorites.filter((f) => f.idDrink !== id);
     setFavorites(updated);
     saveFavorites(updated);
   }
 
   return (
-    <main className="min-h-screen bg-neutral-50 dark:bg-neutral-950 px-4 py-12">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-12">
+    <main className="min-h-screen px-4 py-12 bg-gradient-to-br from-white/40 via-white/20 to-white/40 dark:from-black/25 dark:via-black/10 dark:to-black/25 backdrop-blur-[2px]">
+      <div className="max-w-4xl mx-auto space-y-12">
+
+        <h1 className="text-4xl font-bold text-center">
           ❤️ Mes cocktails favoris
         </h1>
 
         {favorites.length === 0 ? (
-          <div className="text-center space-y-4">
-            <p className="text-neutral-600 dark:text-neutral-400">
+          <div className="glass-card text-center space-y-6">
+            <p className="text-neutral-700 dark:text-neutral-300">
               Vous n’avez pas encore ajouté de favoris.
             </p>
 
             <Link
               href="/questionnaire"
-              className="inline-block px-6 py-3 rounded-xl bg-rose-600 text-white hover:bg-rose-700 transition"
+              className="inline-block px-6 py-3 rounded-xl bg-rose-600 text-white hover:bg-rose-700 transition shadow-lg"
             >
               Découvrir des cocktails
             </Link>
@@ -86,42 +79,38 @@ export default function FavorisPage() {
             {favorites.map((drink) => (
               <div
                 key={drink.idDrink}
-                className="rounded-2xl p-6 shadow-lg bg-white dark:bg-neutral-900 space-y-4"
+                className="glass-card space-y-4"
               >
                 <h2 className="text-2xl font-semibold">
                   🍸 {drink.strDrink}
                 </h2>
 
                 <button
-                  onClick={() =>
-                    removeFavorite(drink.idDrink)
-                  }
+                  onClick={() => removeFavorite(drink.idDrink)}
                   className="text-sm text-rose-600 hover:underline"
                 >
                   ❌ Retirer des favoris
                 </button>
 
-                <div className="flex gap-4 items-start">
+                <div className="flex gap-6 items-start">
                   {drink.strDrinkThumb && (
                     <Image
                       src={drink.strDrinkThumb}
                       alt={drink.strDrink}
                       width={100}
                       height={100}
-                      className="rounded-lg object-cover"
+                      className="rounded-xl object-cover shadow-md"
                     />
                   )}
 
                   <div>
-                    <ul className="list-disc ml-5 text-sm">
-                      {parseIngredients(drink).map(
-                        (ingredient, idx) => (
-                          <li key={idx}>{ingredient}</li>
-                        )
-                      )}
+                    <ul className="list-disc ml-5 text-sm text-neutral-700 dark:text-neutral-300">
+                      {parseIngredients(drink).map((ingredient, idx) => (
+                        <li key={idx}>{ingredient}</li>
+                      ))}
                     </ul>
 
-                    <p className="text-sm mt-3 italic">
+                    <p className="text-sm mt-4 italic text-neutral-600 dark:text-neutral-400">
                       {drink.strInstructions}
                     </p>
                   </div>
@@ -131,13 +120,13 @@ export default function FavorisPage() {
           </div>
         )}
 
-        <div className="text-center mt-16">
-          <Link
-            href="/"
-            className="inline-block px-6 py-3 rounded-xl bg-neutral-800 text-white hover:bg-neutral-700 transition"
+        <div className="text-center pt-4">
+          <button
+            onClick={() => router.back()}
+            className="inline-block px-6 py-3 rounded-xl bg-neutral-800 text-white hover:bg-neutral-700 transition shadow-lg"
           >
-            Retour à l’accueil
-          </Link>
+            ← Retour
+          </button>
         </div>
       </div>
     </main>

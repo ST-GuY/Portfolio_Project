@@ -37,22 +37,37 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
-      <h1 className="text-5xl font-bold mb-6">
-        {content[lang].title}
-        <span className="text-rose-500">&</span>Moi
-      </h1>
+    <main className="min-h-screen flex items-center justify-center px-6">
+      <div className="glass-card max-w-2xl text-center space-y-6">
+        <h1 className="text-5xl font-bold tracking-tight">
+          {content[lang].title}
+          <span className="text-rose-500">&</span>Moi
+        </h1>
 
-      <p className="max-w-xl text-neutral-600 dark:text-neutral-300 mb-10">
-        {content[lang].subtitle}
-      </p>
+        <p className="text-neutral-800 dark:text-neutral-200 text-lg leading-relaxed">
+          {content[lang].subtitle}
+        </p>
 
-      <Link
-        href="/questionnaire"
-        className="bg-rose-600 hover:bg-rose-700 text-white px-8 py-4 rounded-xl transition transform hover:scale-105"
-      >
-        {content[lang].button}
-      </Link>
+        <Link
+          href="/questionnaire"
+          className="
+            inline-block
+            bg-rose-600
+            hover:bg-rose-700
+            text-white
+            px-8
+            py-4
+            rounded-xl
+            transition
+            transform
+            hover:scale-105
+            shadow-lg
+            hover:shadow-xl
+          "
+        >
+          {content[lang].button}
+        </Link>
+      </div>
     </main>
   );
 }

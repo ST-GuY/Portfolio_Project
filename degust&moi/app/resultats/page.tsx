@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { getRecommendations } from "../../src/lib/recommendation";
 import type { BaseSpirit } from "../../src/lib/recommendation";
 
@@ -153,14 +154,21 @@ export default function ResultatsPage() {
           {lang === "fr" ? "Vos recommandations" : "Your recommendations"}
         </h1>
 
+        <div className="flex justify-end">
+          <Link
+            href="/favoris"
+            className="inline-block px-4 py-2 rounded-xl bg-white/80 dark:bg-white/10 backdrop-blur-md border border-white/20 dark:border-white/10 shadow hover:scale-105 transition"
+          >
+            ❤️ {lang === "fr" ? "Mes favoris" : "My favorites"}
+          </Link>
+        </div>
+
         {recommendations.map((rec, index) => {
           const drinks = cocktails[index];
 
           return (
-            <div
-              key={index}
-              className="rounded-2xl p-8 shadow-2xl bg-white/80 dark:bg-white/5 backdrop-blur-md border border-white/20 dark:border-white/10 space-y-8"
-            >
+            <div key={index} className="glass-card space-y-8">
+
               <div>
                 <h2 className="text-2xl font-semibold">
                   {rec.name[lang]}
@@ -206,10 +214,8 @@ export default function ResultatsPage() {
                         : ""
                     }`}
                   >
-                    {/* Titre + Badges */}
                     <h3 className="font-semibold text-lg flex items-center gap-3">
                       🍸 {drink.strDrink}
-
                       <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300">
                         🌍 {hasFrench ? "FR" : "EN"}
                       </span>
@@ -247,11 +253,9 @@ export default function ResultatsPage() {
 
                       <div>
                         <ul className="list-disc ml-5 text-sm text-neutral-700 dark:text-neutral-300">
-                          {parseIngredients(drink).map(
-                            (ingredient, idx) => (
-                              <li key={idx}>{ingredient}</li>
-                            )
-                          )}
+                          {parseIngredients(drink).map((ingredient, idx) => (
+                            <li key={idx}>{ingredient}</li>
+                          ))}
                         </ul>
 
                         <p className="text-sm mt-4 italic text-neutral-600 dark:text-neutral-400">
@@ -267,6 +271,17 @@ export default function ResultatsPage() {
             </div>
           );
         })}
+
+        <div className="text-center pt-4">
+          <Link
+            href="/questionnaire"
+            className="inline-block px-8 py-4 rounded-xl bg-rose-600 text-white hover:bg-rose-700 transition shadow-lg"
+          >
+            {lang === "fr"
+              ? "Refaire le questionnaire"
+              : "Restart questionnaire"}
+          </Link>
+        </div>
 
         {lastAdded && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-neutral-900/90 text-white px-6 py-3 rounded-xl shadow-lg animate-fade-in">

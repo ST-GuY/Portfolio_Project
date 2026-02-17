@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import Link from "next/link";
 import ThemeToggle from "./components/ThemeToggle";
 import LanguageToggle from "./components/LanguageToggle";
 
@@ -31,6 +32,25 @@ export default function RootLayout({
       >
         {/* HEADER GLOBAL */}
         <header className="fixed top-4 right-4 z-50 flex items-center gap-4">
+
+          {/* ❤️ Bouton Favoris */}
+          <Link
+            href="/favoris"
+            className="
+              px-4 py-2
+              rounded-xl
+              bg-white/80
+              dark:bg-white/10
+              backdrop-blur-md
+              border border-white/20 dark:border-white/10
+              shadow
+              hover:scale-105
+              transition
+            "
+          >
+            ❤️
+          </Link>
+
           <LanguageToggle />
           <ThemeToggle />
         </header>
