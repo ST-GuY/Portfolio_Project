@@ -1,8 +1,8 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import Link from "next/link";
-import LanguageToggle from "./components/LanguageToggle";
-import FavoritesHeaderButton from "./components/FavoritesHeaderButton";
+import LanguageToggle from "../src/components/LanguageToggle";
+import FavoritesHeaderButton from "../src/components/FavoritesHeaderButton";
 
 export const metadata: Metadata = {
   title: "Dégust&Moi",

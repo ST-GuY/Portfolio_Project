@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import CustomSelect from "../components/CustomSelect";
+import CustomSelect from "../../src/components/CustomSelect";
 
 type Lang = "fr" | "en";
 

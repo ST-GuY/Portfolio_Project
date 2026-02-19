@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Recommendation } from "../../src/lib/recommendation";
+import type { Recommendation } from "../lib/recommendation";
 
 /* ================= TYPES ================= */
 
