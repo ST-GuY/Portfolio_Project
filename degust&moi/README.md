@@ -1,10 +1,10 @@
 # 🍷 Dégust&Moi
 
-Dégust&Moi est une application web éducative et non commerciale qui aide les utilisateurs
-à découvrir des alcools correspondant à leurs goûts, leur humeur ou leur contexte.
+Dégust&Moi est une application web éducative et non commerciale qui aide les utilisateurs à découvrir des alcools correspondant à leurs goûts, leur humeur ou leur contexte.
 
-Le projet se concentre sur la découverte, la compréhension et la culture des alcools,
-sans vente, sans publicité et sans incitation à la consommation excessive.
+Le projet se concentre sur la découverte, la compréhension et la culture des alcools, sans vente, sans publicité et sans incitation à la consommation excessive.
+
+Il s’agit d’un MVP évolutif développé dans le cadre d’un portfolio, intégrant désormais une authentification sécurisée et une base de données.
 
 ---
 
@@ -19,7 +19,7 @@ Dégust&Moi vise à :
 - expliquer clairement pourquoi un alcool est suggéré
 - promouvoir une approche responsable et pédagogique
 
-Ce projet est développé dans le cadre d’un **MVP de portfolio**, avec un périmètre volontairement limité.
+L’objectif n’est pas de vendre, mais d’éduquer et d’accompagner.
 
 ---
 
@@ -42,16 +42,32 @@ Ce projet est développé dans le cadre d’un **MVP de portfolio**, avec un pé
   - contexte ou humeur
 - Génération de **maximum 3 recommandations**
 - Explication éducative pour chaque recommandation
-- Navigation simple et fluide
-- Aucune création de compte
+- Affichage de cocktails associés (via API externe)
+- Interface moderne avec micro-interactions (animations premium)
 
-### Hors périmètre (volontairement exclus)
-- Vente d’alcool
-- Publicité ou promotion de marque
-- Comptes utilisateurs
-- Avis ou notations communautaires
-- Algorithmes complexes ou IA
+### 🔐 Authentification & gestion des favoris
 
+Le projet intègre un système d’authentification sécurisé via Supabase.
+
+Fonctionnalités :
+
+- Création de compte (email + mot de passe)
+- Connexion / Déconnexion
+- Sauvegarde des favoris en base de données
+- Synchronisation multi-appareils
+- Accès aux favoris uniquement pour l’utilisateur connecté
+
+
+### 🛡️ Sécurité
+
+Le projet implémente :
+
+- Row Level Security (RLS)
+- Politiques d’accès par utilisateur
+- Protection des données sensibles
+- Isolation stricte des favoris par utilisateur
+
+Chaque utilisateur ne peut consulter, modifier ou supprimer que ses propres données.
 ---
 
 ## 🧠 Logique de recommandation
@@ -67,27 +83,26 @@ L’objectif n’est pas la précision algorithmique, mais la **compréhension e
 
 ## 🌐 Données & API externe
 
-Afin d’enrichir l’expérience utilisateur, Dégust&Moi utilise une API publique externe :
+Dégust&Moi utilise l’API publique suivante :
 
 TheCocktailDB
 
 🔗 https://www.thecocktaildb.com/api.php
 
-Cette API permet d’afficher, pour chaque recommandation :
+Cette API permet d’afficher :
 
 - un exemple réel et représentatif
 - une image
 - un nom
 - une description simple
 
-Les données issues de cette API sont utilisées à titre informatif et pédagogique uniquement.
-Elles ne constituent ni une recommandation commerciale, ni une incitation à la consommation.
+Les données sont utilisées à titre informatif et pédagogique uniquement.
 
-L’API est consommée via une API Route Next.js, afin de :
+Les appels API sont centralisés via des API Routes Next.js afin de :
 
-- centraliser les appels externes
-- garantir une meilleure maintenabilité
-- conserver une architecture propre et évolutive
+- Maintenir une architecture propre
+- Sécuriser les appels externes
+- Faciliter l’évolution du projet
 
 ---
 
@@ -97,17 +112,19 @@ L’API est consommée via une API Route Next.js, afin de :
 - **UI** : React
 - **Langage** : TypeScript
 - **Styles** : Tailwind CSS
-- **Backend** : API Routes Next.js
-- **Données** :
-  - données locales mockées (logique de recommandation)
-  - API externe (TheCocktailDB) pour l’enrichissement visuel
+- **Backend** :
+  - API Routes Next.js
+  - Supabase (Base de données + Authentification)
+- **Base de données** : PostgreSQL (via Supabase)
+- **Authentification** : Email / mot de passe (Supabase Auth)
+- **API externe** : TheCocktailDB
 - **Déploiement** : Vercel (prévu)
 
 Cette stack a été choisie pour :
-- sa popularité sur le marché
-- sa rapidité de mise en place
-- sa pertinence pour un projet solo et un MVP
 
+- Sa popularité sur le marché
+- Sa pertinence pour un projet SaaS moderne
+- Sa scalabilité pour une évolution future
 ---
 
 ## 🗂️ Architecture simplifiée
@@ -116,17 +133,22 @@ Cette stack a été choisie pour :
 src/
 ├─ app/
 │  ├─ page.tsx
+│  ├─ auth/
+│  │  └─ page.tsx
 │  ├─ questionnaire/
 │  │  └─ page.tsx
 │  ├─ resultats/
 │  │  └─ page.tsx
+│  ├─ favoris/
+│  │  └─ page.tsx
 │  └─ api/
 │     └─ alcohol/
 │        └─ route.ts
-├─ data/
-│  └─ alcohols.ts
-└─ lib/
-   └─ recommendation.ts
+├─ lib/
+│  ├─ recommendation.ts
+│  └─ supabase.ts
+└─ data/
+   └─ alcohols.ts
 ```
 
 ---
@@ -149,3 +171,33 @@ npm run dev
 
 L’application est accessible à l’adresse :
 http://localhost:3000
+
+
+### 🚀 Évolution future possible
+
+Sauvegarde de l’historique des questionnaires
+
+- Profil utilisateur avancé
+- Recommandations plus dynamiques
+- Internationalisation complète
+- Déploiement production sur Vercel
+
+### 📌 Remarque importante
+
+Dégust&Moi est un projet éducatif non commercial.
+Il ne vend pas d’alcool et ne promeut aucune marque spécifique.
+
+La consommation d’alcool doit toujours rester responsable.
+
+### 🎯 Conclusion
+
+Dégust&Moi est un MVP portfolio combinant :
+
+- Logique métier claire
+- API externe
+- Authentification sécurisée
+- Base de données relationnelle
+- Micro-interactions UI modernes
+- Architecture évolutive
+
+Un projet démontrant des compétences full-stack modernes.
