@@ -12,14 +12,14 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* ================= TOAST ANIMATION ================= */
+/* ================= TOAST SLIDE PREMIUM ================= */
 
 @keyframes fade-in {
-  from {
+  0% {
     opacity: 0;
-    transform: translate(-50%, 15px);
+    transform: translate(-50%, 20px);
   }
-  to {
+  100% {
     opacity: 1;
     transform: translate(-50%, 0);
   }
@@ -46,14 +46,14 @@ option {
 /* ================= HEART POP ================= */
 
 @keyframes heart-pop {
-  0% { transform: scale(1); }
-  30% { transform: scale(1.4); }
-  60% { transform: scale(0.9); }
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.4); }
+  60%  { transform: scale(0.9); }
   100% { transform: scale(1); }
 }
 
 .animate-heart-pop {
-  animation: heart-pop 0.5s ease;
+  animation: heart-pop 0.45s cubic-bezier(.34,1.56,.64,1);
 }
 
 /* ================= BADGE BOUNCE ================= */
@@ -69,7 +69,7 @@ option {
   animation: badge-bounce 0.5s ease;
 }
 
-/* ================= CARD PULSE ================= */
+/* ================= CARD GLOW PREMIUM ================= */
 
 @keyframes card-pulse {
   0% {
@@ -78,7 +78,7 @@ option {
   }
   50% {
     transform: scale(1.02);
-    box-shadow: 0 8px 30px rgba(244, 63, 94, 0.25);
+    box-shadow: 0 12px 35px rgba(244, 63, 94, 0.35);
   }
   100% {
     transform: scale(1);
@@ -104,4 +104,10 @@ option {
       border border-white/10
       shadow-2xl;
   }
+}
+
+/* ================= FAVORITE GLOW ================= */
+
+.favorite-glow {
+  box-shadow: 0 0 12px rgba(244, 63, 94, 0.45);
 }

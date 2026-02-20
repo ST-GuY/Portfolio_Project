@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import LanguageToggle from "../src/components/LanguageToggle";
 import FavoritesHeaderButton from "../src/components/FavoritesHeaderButton";
+import AuthHeaderButton from "@/src/components/AuthHeaderButton";
 
 export const metadata: Metadata = {
   title: "Dégust&Moi",
@@ -31,6 +32,7 @@ export default function RootLayout({
         {/* HEADER GLOBAL */}
         <header className="fixed top-4 right-4 z-50 flex items-center gap-4">
           <FavoritesHeaderButton />
+          <AuthHeaderButton />
           <LanguageToggle />
         </header>
 

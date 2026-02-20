@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { getRecommendations } from "../../src/lib/recommendation";
 import type { BaseSpirit } from "../../src/lib/recommendation";
+import { supabase } from "@/src/lib/supabase";
+import { User } from "@supabase/supabase-js";
 
 /* ================= TYPES ================= */
 
@@ -26,36 +28,61 @@ type Recommendation = {
 
 type Drink = any;
 
-const FAVORITES_KEY = "degust-moi-favorites";
-
-function getFavorites(): Drink[] {
-  if (typeof window === "undefined") return [];
-  return JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]");
-}
-
-function saveFavorites(favorites: Drink[]) {
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-}
-
 export default function ResultatsPage() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [cocktails, setCocktails] = useState<Record<number, Drink[]>>({});
   const [favorites, setFavorites] = useState<Drink[]>([]);
   const [lang, setLang] = useState<Lang>("fr");
   const [lastAdded, setLastAdded] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+
+  /* ================= AUTH + LOAD FAVORITES ================= */
 
   useEffect(() => {
-    setFavorites(getFavorites());
+    checkUser();
 
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+
+        if (currentUser) {
+          loadFavorites(currentUser.id);
+        } else {
+          setFavorites([]);
+        }
+      }
+    );
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  async function checkUser() {
+    const { data } = await supabase.auth.getUser();
+    if (data.user) {
+      setUser(data.user);
+      loadFavorites(data.user.id);
+    }
+  }
+
+  async function loadFavorites(userId: string) {
+    const { data } = await supabase
+      .from("favorites")
+      .select("*")
+      .eq("user_id", userId);
+
+    if (data) {
+      setFavorites(data.map((item) => item.drink_data));
+    }
+  }
+
+  /* ================= LANGUAGE + RECOMMENDATIONS ================= */
+
+  useEffect(() => {
     const storedLang = localStorage.getItem("lang") as Lang | null;
     if (storedLang) setLang(storedLang);
-
-    const onLangChange = () => {
-      const updatedLang = localStorage.getItem("lang") as Lang | null;
-      if (updatedLang) setLang(updatedLang);
-    };
-
-    window.addEventListener("languageChange", onLangChange);
 
     const storedAnswers = localStorage.getItem("degust-moi-answers");
     if (!storedAnswers) return;
@@ -65,11 +92,9 @@ export default function ResultatsPage() {
     setRecommendations(recos);
 
     fetchCocktails(recos);
-
-    return () => {
-      window.removeEventListener("languageChange", onLangChange);
-    };
   }, []);
+
+  /* ================= FETCH COCKTAILS ================= */
 
   async function fetchCocktails(recos: Recommendation[]) {
     const INGREDIENTS_BY_BASE: Record<BaseSpirit, string[]> = {
@@ -127,25 +152,44 @@ export default function ResultatsPage() {
     }
   }
 
-  function toggleFavorite(drink: Drink) {
+  /* ================= FAVORITES ================= */
+
+  async function toggleFavorite(drink: Drink) {
+    if (!user) {
+      alert("Connecte-toi pour ajouter des favoris.");
+      return;
+    }
+
     const exists = favorites.some((f) => f.idDrink === drink.idDrink);
-    let updated;
 
     if (exists) {
-      updated = favorites.filter((f) => f.idDrink !== drink.idDrink);
+      await supabase
+        .from("favorites")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("drink_id", drink.idDrink);
+
+      setFavorites((prev) =>
+        prev.filter((f) => f.idDrink !== drink.idDrink)
+      );
     } else {
-      updated = [...favorites, drink];
+      await supabase.from("favorites").insert({
+        user_id: user.id,
+        drink_id: drink.idDrink,
+        drink_data: drink,
+      });
+
+      setFavorites((prev) => [...prev, drink]);
+
       setLastAdded(null);
       setTimeout(() => {
         setLastAdded(drink.idDrink);
         setTimeout(() => setLastAdded(null), 600);
       }, 10);
     }
-
-    setFavorites(updated);
-    saveFavorites(updated);
-    window.dispatchEvent(new Event("favoritesUpdated"));
   }
+
+  /* ================= UI ================= */
 
   return (
     <main className="min-h-screen px-4 py-12 bg-gradient-to-br from-white/40 via-white/20 to-white/40 dark:from-black/25 dark:via-black/10 dark:to-black/25 backdrop-blur-[2px]">
@@ -161,6 +205,7 @@ export default function ResultatsPage() {
           return (
             <div key={index} className="glass-card space-y-8">
 
+              {/* TITRE + DESCRIPTION */}
               <div>
                 <h2 className="text-2xl font-semibold">
                   {rec.name[lang]}
@@ -170,6 +215,7 @@ export default function ResultatsPage() {
                 </p>
               </div>
 
+              {/* IMAGE BOUTEILLE */}
               {rec.bottle && (
                 <div className="flex gap-6 items-center bg-white/40 dark:bg-white/10 p-4 rounded-xl backdrop-blur-sm">
                   <Image
@@ -190,6 +236,7 @@ export default function ResultatsPage() {
                 </div>
               )}
 
+              {/* COCKTAILS */}
               {drinks?.map((drink, i) => {
                 const isFavorite = favorites.some(
                   (f) => f.idDrink === drink.idDrink
@@ -204,7 +251,7 @@ export default function ResultatsPage() {
                       lastAdded === drink.idDrink
                         ? "animate-card-pulse"
                         : ""
-                    }`}
+                    } ${isFavorite ? "favorite-glow" : ""}`}
                   >
                     <h3 className="font-semibold text-lg flex items-center gap-3">
                       🍸 {drink.strDrink}
@@ -237,8 +284,8 @@ export default function ResultatsPage() {
                         <Image
                           src={drink.strDrinkThumb}
                           alt={drink.strDrink}
-                          width={100}
-                          height={100}
+                          width={120}
+                          height={120}
                           className="rounded-xl object-cover shadow-md"
                         />
                       )}
@@ -264,6 +311,12 @@ export default function ResultatsPage() {
           );
         })}
 
+        {lastAdded && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-neutral-900/90 text-white px-6 py-3 rounded-xl shadow-lg animate-fade-in">
+            ❤️ Ajouté aux favoris
+          </div>
+        )}
+
         <div className="text-center pt-4">
           <Link
             href="/questionnaire"
@@ -275,15 +328,12 @@ export default function ResultatsPage() {
           </Link>
         </div>
 
-        {lastAdded && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-neutral-900/90 text-white px-6 py-3 rounded-xl shadow-lg animate-fade-in">
-            ❤️ Ajouté aux favoris
-          </div>
-        )}
       </div>
     </main>
   );
 }
+
+/* ================= INGREDIENT PARSER ================= */
 
 function parseIngredients(drink: any): string[] {
   const ingredients: string[] = [];
