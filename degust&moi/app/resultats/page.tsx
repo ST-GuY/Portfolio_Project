@@ -7,6 +7,7 @@ import { getRecommendations } from "../../src/lib/recommendation";
 import type { BaseSpirit } from "../../src/lib/recommendation";
 import { supabase } from "@/src/lib/supabase";
 import { User } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
 
 /* ================= TYPES ================= */
 
@@ -35,37 +36,9 @@ export default function ResultatsPage() {
   const [lang, setLang] = useState<Lang>("fr");
   const [lastAdded, setLastAdded] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
 
   /* ================= AUTH + LOAD FAVORITES ================= */
-
-  useEffect(() => {
-    checkUser();
-
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-
-        if (currentUser) {
-          loadFavorites(currentUser.id);
-        } else {
-          setFavorites([]);
-        }
-      }
-    );
-
-    return () => {
-      listener.subscription.unsubscribe();
-    };
-  }, []);
-
-  async function checkUser() {
-    const { data } = await supabase.auth.getUser();
-    if (data.user) {
-      setUser(data.user);
-      loadFavorites(data.user.id);
-    }
-  }
 
   async function loadFavorites(userId: string) {
     const { data } = await supabase
@@ -77,6 +50,35 @@ export default function ResultatsPage() {
       setFavorites(data.map((item) => item.drink_data));
     }
   }
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+
+      if (!data.session) {
+        router.push("/auth");
+        return;
+      }
+
+      const currentUser = data.session.user;
+      setUser(currentUser);
+      loadFavorites(currentUser.id);
+    };
+
+    checkSession();
+
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (!session) {
+          router.push("/auth");
+        }
+      }
+    );
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
 
   /* ================= LANGUAGE + RECOMMENDATIONS ================= */
 

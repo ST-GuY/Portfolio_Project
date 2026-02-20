@@ -2,56 +2,87 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/src/lib/supabase";
+import { User } from "@supabase/supabase-js";
 
 /* ================= TYPES ================= */
 
 type Drink = any;
 
-const FAVORITES_KEY = "degust-moi-favorites";
-
-/* ================= HELPERS ================= */
-
-function getFavorites(): Drink[] {
-  if (typeof window === "undefined") return [];
-  return JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]");
-}
-
-function saveFavorites(favorites: Drink[]) {
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-}
-
-function parseIngredients(drink: Drink): string[] {
-  const ingredients: string[] = [];
-
-  for (let i = 1; i <= 15; i++) {
-    const name = drink[`strIngredient${i}`];
-    const measure = drink[`strMeasure${i}`];
-
-    if (name) {
-      ingredients.push(measure ? `${name} – ${measure}` : name);
-    }
-  }
-
-  return ingredients;
-}
-
 /* ================= COMPONENT ================= */
 
 export default function FavorisPage() {
   const [favorites, setFavorites] = useState<Drink[]>([]);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
+  /* ================= AUTH PROTECTION ================= */
+
   useEffect(() => {
-    setFavorites(getFavorites());
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+
+      if (!data.session) {
+        router.push("/auth");
+        return;
+      }
+
+      const currentUser = data.session.user;
+      setUser(currentUser);
+      loadFavorites(currentUser.id);
+    };
+
+    checkSession();
   }, []);
 
-  function removeFavorite(id: string) {
-    const updated = favorites.filter((f) => f.idDrink !== id);
-    setFavorites(updated);
-    saveFavorites(updated);
+  /* ================= LOAD FAVORITES ================= */
+
+  async function loadFavorites(userId: string) {
+    const { data } = await supabase
+      .from("favorites")
+      .select("*")
+      .eq("user_id", userId);
+
+    if (data) {
+      setFavorites(data.map((item) => item.drink_data));
+    }
   }
+
+  /* ================= REMOVE FAVORITE ================= */
+
+  async function removeFavorite(drinkId: string) {
+    if (!user) return;
+
+    await supabase
+      .from("favorites")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("drink_id", drinkId);
+
+    setFavorites((prev) =>
+      prev.filter((f) => f.idDrink !== drinkId)
+    );
+  }
+
+  /* ================= INGREDIENT PARSER ================= */
+
+  function parseIngredients(drink: Drink): string[] {
+    const ingredients: string[] = [];
+
+    for (let i = 1; i <= 15; i++) {
+      const name = drink[`strIngredient${i}`];
+      const measure = drink[`strMeasure${i}`];
+
+      if (name) {
+        ingredients.push(measure ? `${name} – ${measure}` : name);
+      }
+    }
+
+    return ingredients;
+  }
+
+  /* ================= UI ================= */
 
   return (
     <main className="min-h-screen px-4 py-12 bg-gradient-to-br from-white/40 via-white/20 to-white/40 dark:from-black/25 dark:via-black/10 dark:to-black/25 backdrop-blur-[2px]">
@@ -67,12 +98,12 @@ export default function FavorisPage() {
               Vous n’avez pas encore ajouté de favoris.
             </p>
 
-            <Link
-              href="/questionnaire"
+            <button
+              onClick={() => router.push("/questionnaire")}
               className="inline-block px-6 py-3 rounded-xl bg-rose-600 text-white hover:bg-rose-700 transition shadow-lg"
             >
               Découvrir des cocktails
-            </Link>
+            </button>
           </div>
         ) : (
           <div className="space-y-10">
@@ -128,6 +159,7 @@ export default function FavorisPage() {
             ← Retour
           </button>
         </div>
+
       </div>
     </main>
   );
