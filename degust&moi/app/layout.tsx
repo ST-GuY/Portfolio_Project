@@ -1,9 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import Link from "next/link";
-import LanguageToggle from "../src/components/LanguageToggle";
-import FavoritesHeaderButton from "../src/components/FavoritesHeaderButton";
-import AuthHeaderButton from "@/src/components/AuthHeaderButton";
+import Header from "@/src/components/Header";
 
 export const metadata: Metadata = {
   title: "Dégust&Moi",
@@ -19,6 +16,7 @@ export default function RootLayout({
     <html lang="fr" className="dark">
       <body
         className="
+          relative
           min-h-screen
           bg-cover
           bg-center
@@ -29,14 +27,15 @@ export default function RootLayout({
           backgroundImage: "url('/images/background.png')",
         }}
       >
-        {/* HEADER GLOBAL */}
-        <header className="fixed top-4 right-4 z-50 flex items-center gap-4">
-          <FavoritesHeaderButton />
-          <AuthHeaderButton />
-          <LanguageToggle />
-        </header>
+        {/* 🔥 Voile premium léger */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] pointer-events-none" />
 
-        {children}
+        <Header />
+
+        {/* Contenu */}
+        <div className="relative pt-28">
+          {children}
+        </div>
       </body>
     </html>
   );

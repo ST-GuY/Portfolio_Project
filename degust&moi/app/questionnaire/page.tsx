@@ -14,6 +14,7 @@ const content = {
     taste: "Préférence de goût",
     intensity: "Intensité souhaitée",
     context: "Contexte",
+    home: "Accueil",
     options: {
       sweet: "Sucré",
       dry: "Sec",
@@ -34,6 +35,7 @@ const content = {
     taste: "Taste preference",
     intensity: "Desired intensity",
     context: "Context",
+    home: "Home",
     options: {
       sweet: "Sweet",
       dry: "Dry",
@@ -86,7 +88,8 @@ export default function QuestionnairePage() {
   const t = content[lang];
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4">
+    <main className="relative min-h-screen flex items-center justify-center px-4">
+
       <div className="glass-card w-full max-w-md">
         <h1 className="text-3xl font-bold mb-2 text-center">
           {t.title}

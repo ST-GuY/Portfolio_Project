@@ -194,7 +194,7 @@ export default function ResultatsPage() {
   /* ================= UI ================= */
 
   return (
-    <main className="min-h-screen px-4 py-12 bg-gradient-to-br from-white/40 via-white/20 to-white/40 dark:from-black/25 dark:via-black/10 dark:to-black/25 backdrop-blur-[2px]">
+    <main className="min-h-screen px-4 py-12">
       <div className="max-w-4xl mx-auto space-y-12">
 
         <h1 className="text-4xl font-bold tracking-tight">
