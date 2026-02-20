@@ -47,7 +47,7 @@ L’objectif n’est pas de vendre, mais d’éduquer et d’accompagner.
 
 ---
 
-### 🔐 Authentification & gestion des favoris
+## 🔐 Authentification & gestion des favoris
 
 Le projet intègre un système d’authentification sécurisé via Supabase.
 
@@ -61,7 +61,7 @@ Fonctionnalités :
 
 ---
 
-### 🛡️ Sécurité
+## 🛡️ Sécurité
 
 Le projet implémente :
 
@@ -70,7 +70,8 @@ Le projet implémente :
 - Protection des données sensibles
 - Isolation stricte des favoris par utilisateur
 
-Chaque utilisateur ne peut consulter, modifier ou supprimer que ses propres données.
+  Chaque utilisateur ne peut consulter, modifier ou supprimer que ses propres données.
+
 ---
 
 ## 🧠 Logique de recommandation
@@ -175,8 +176,9 @@ npm run dev
 L’application est accessible à l’adresse :
 http://localhost:3000
 
+---
 
-### 🚀 Évolution future possible
+## 🚀 Évolution future possible
 
 Sauvegarde de l’historique des questionnaires
 
@@ -185,14 +187,18 @@ Sauvegarde de l’historique des questionnaires
 - Internationalisation complète
 - Déploiement production sur Vercel
 
-### 📌 Remarque importante
+---
+
+## 📌 Remarque importante
 
 Dégust&Moi est un projet éducatif non commercial.
 Il ne vend pas d’alcool et ne promeut aucune marque spécifique.
 
 La consommation d’alcool doit toujours rester responsable.
 
-### 🎯 Conclusion
+---
+
+## 🎯 Conclusion
 
 Dégust&Moi est un MVP portfolio combinant :
 
@@ -204,3 +210,5 @@ Dégust&Moi est un MVP portfolio combinant :
 - Architecture évolutive
 
 Un projet démontrant des compétences full-stack modernes.
+
+---
