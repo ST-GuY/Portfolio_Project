@@ -45,6 +45,8 @@ L’objectif n’est pas de vendre, mais d’éduquer et d’accompagner.
 - Affichage de cocktails associés (via API externe)
 - Interface moderne avec micro-interactions (animations premium)
 
+---
+
 ### 🔐 Authentification & gestion des favoris
 
 Le projet intègre un système d’authentification sécurisé via Supabase.
@@ -57,6 +59,7 @@ Fonctionnalités :
 - Synchronisation multi-appareils
 - Accès aux favoris uniquement pour l’utilisateur connecté
 
+---
 
 ### 🛡️ Sécurité
 
