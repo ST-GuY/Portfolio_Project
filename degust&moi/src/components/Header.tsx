@@ -87,11 +87,15 @@ export default function Header() {
           </Link>
         )}
 
-        {/* Déconnexion */}
-        {user && (
+        {/* Auth */}
+        {user ? (
           <button onClick={logout} className="glass-btn">
             {lang === "fr" ? "Déconnexion" : "Logout"}
           </button>
+        ) : (
+          <Link href="/auth" className="glass-btn">
+            {lang === "fr" ? "Connexion" : "Login"}
+          </Link>
         )}
 
         {/* Lang switch */}
