@@ -1,52 +1,57 @@
 <svg width="220" height="400" viewBox="0 0 220 400" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="glass-whisky" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="glass-vermouth" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/>
       <stop offset="100%" stop-color="#ffffff" stop-opacity="0.08"/>
     </linearGradient>
 
-    <linearGradient id="liquid-whisky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#fbbf24"/>
-      <stop offset="100%" stop-color="#78350f"/>
+    <linearGradient id="liquid-vermouth" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7f1d1d"/>
+      <stop offset="50%" stop-color="#991b1b"/>
+      <stop offset="100%" stop-color="#4c0519"/>
     </linearGradient>
 
-    <linearGradient id="highlight-whisky" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="highlight-vermouth" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4"/>
       <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
 
-    <clipPath id="clip-whisky">
+    <clipPath id="clip-vermouth">
       <path d="M90 40 L130 40 L130 110 C130 140 165 170 165 230 L165 330 C165 360 55 360 55 330 L55 230 C55 170 90 140 90 110 Z"/>
     </clipPath>
   </defs>
 
+  <!-- Ombre -->
   <ellipse cx="110" cy="382" rx="70" ry="14" fill="#000" opacity="0.12"/>
 
+  <!-- Corps -->
   <path d="M90 40 L130 40 L130 110 C130 140 165 170 165 230 L165 330 C165 360 55 360 55 330 L55 230 C55 170 90 140 90 110 Z"
-        fill="url(#glass-whisky)" stroke="#e5e5e5" stroke-width="2.5"/>
+        fill="url(#glass-vermouth)" stroke="#e5e5e5" stroke-width="2.5"/>
 
+  <!-- Liquide rouge profond -->
   <path d="M65 245 L155 245 L155 330 C155 350 65 350 65 330 Z"
-        fill="url(#liquid-whisky)"/>
+        fill="url(#liquid-vermouth)"/>
 
-  <g clip-path="url(#clip-whisky)">
+  <!-- Reflet -->
+  <g clip-path="url(#clip-vermouth)">
     <rect x="75" y="70" width="20" height="240"
-          fill="url(#highlight-whisky)" opacity="0.25"/>
+          fill="url(#highlight-vermouth)" opacity="0.25"/>
   </g>
 
-  <!-- Bouchon premium -->
-  <rect x="85" y="15" width="50" height="40" rx="10" fill="#5a2e0c"/>
-  <rect x="92" y="5" width="36" height="18" rx="6" fill="#3b1f0c"/>
+  <!-- Capsule bordeaux -->
+  <rect x="85" y="15" width="50" height="40" rx="10" fill="#5b0f1a"/>
+  <rect x="92" y="5" width="36" height="18" rx="6" fill="#3f0712"/>
 
   <!-- Étiquette -->
   <rect x="65" y="260" width="90" height="45" rx="8"
-        fill="#fdf6e3" stroke="#78350f" stroke-width="1.8"/>
+        fill="#fff8ed" stroke="#7f1d1d" stroke-width="1.6"/>
 
-  <text x="110" y="290"
+  <text x="110" y="288"
         text-anchor="middle"
         font-family="Georgia, serif"
-        font-size="18"
-        fill="#3b2f2f"
+        font-size="17"
+        fill="#4c0519"
         font-weight="bold">
-    Whisky
+    Vermouth
   </text>
 </svg>

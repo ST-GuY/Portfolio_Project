@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getRecommendations } from "../../src/lib/recommendation";
-import type { BaseSpirit } from "../../src/lib/recommendation";
+import type { BaseSpirit } from "../../src/lib/spiritMapping";
 import { supabase } from "@/src/lib/supabase";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
@@ -100,15 +100,38 @@ export default function ResultatsPage() {
 
   async function fetchCocktails(recos: Recommendation[]) {
     const INGREDIENTS_BY_BASE: Record<BaseSpirit, string[]> = {
-      white_rum: ["Light rum"],
-      amber_rum: ["Dark rum"],
-      gin: ["Gin"],
-      vodka: ["Vodka"],
-      tequila: ["Tequila", "Blanco tequila", "Reposado tequila"],
-      brandy: ["Brandy"],
-      whisky: ["Whiskey", "Bourbon", "Scotch", "Rye whiskey"],
-      wine: ["Red wine"],
-    };
+  /* 🍹 RUM */
+  white_rum: ["Light rum", "White rum"],
+  amber_rum: ["Dark rum", "Spiced rum", "Gold rum"],
+
+  /* 🥃 WHISKY */
+  whisky: ["Whiskey", "Scotch", "Rye whiskey", "Blended whiskey"],
+  bourbon: ["Bourbon"],
+
+  /* 🍸 CLEAR SPIRITS */
+  vodka: ["Vodka"],
+  gin: ["Gin"],
+  tequila: ["Tequila", "Blanco tequila", "Reposado tequila"],
+
+  /* 🥃 BRANDY */
+  brandy: ["Brandy", "Cognac", "Armagnac"],
+
+  /* 🍷 WINE & FORTIFIED */
+  wine: ["Red wine", "White wine", "Sherry"],
+  vermouth: ["Vermouth", "Sweet Vermouth", "Dry Vermouth"],
+
+  /* 🍾 SPARKLING */
+  champagne: ["Champagne", "Prosecco"],
+
+  /* 🍹 LIQUEURS */
+  liqueur: [
+    "Triple Sec",
+    "Amaretto",
+    "Baileys",
+    "Coffee liqueur",
+    "Kahlua",
+  ],
+};
 
     for (const [index, rec] of recos.entries()) {
       const ingredients = INGREDIENTS_BY_BASE[rec.fallbackSpirit];

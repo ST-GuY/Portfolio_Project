@@ -8,8 +8,12 @@ export type BaseSpirit =
   | "vodka"
   | "gin"
   | "whisky"
+  | "bourbon"
   | "tequila"
   | "brandy"
+  | "vermouth"
+  | "liqueur"
+  | "champagne"
   | "wine";
 
 /* ================= NORMALIZATION MAP ================= */
@@ -20,36 +24,49 @@ export type BaseSpirit =
  * (mapping strict, utilisé en fallback)
  */
 const NORMALIZATION_MAP: Record<string, BaseSpirit> = {
-  // 🍹 RUM
+  /* 🍹 RUM */
   "light rum": "white_rum",
   "white rum": "white_rum",
   "dark rum": "amber_rum",
   "spiced rum": "amber_rum",
   "overproof rum": "amber_rum",
 
-  // 🥃 WHISKY
+  /* 🥃 WHISKY */
   "whiskey": "whisky",
   "scotch": "whisky",
-  "bourbon": "whisky",
+  "bourbon": "bourbon",
   "rye whiskey": "whisky",
   "blended whiskey": "whisky",
 
-  // 🍸 CLEAR SPIRITS
+  /* 🍸 CLEAR SPIRITS */
   "vodka": "vodka",
   "gin": "gin",
   "tequila": "tequila",
 
-  // 🥃 BRANDY / COGNAC
+  /* 🥃 BRANDY / COGNAC */
   "brandy": "brandy",
   "cognac": "brandy",
   "armagnac": "brandy",
 
-  // 🍷 WINE
+  /* 🍷 WINE */
   "red wine": "wine",
   "white wine": "wine",
   "wine": "wine",
-  "vermouth": "wine",
-  "sherry": "wine",
+
+  /* 🍷 VERMOUTH (séparé du wine) */
+  "vermouth": "vermouth",
+  "sweet vermouth": "vermouth",
+  "dry vermouth": "vermouth",
+
+  /* 🍾 CHAMPAGNE */
+  "champagne": "champagne",
+  "prosecco": "champagne",
+
+  /* 🍹 LIQUEURS */
+  "triple sec": "liqueur",
+  "amaretto": "liqueur",
+  "baileys": "liqueur",
+  "coffee liqueur": "liqueur",
 };
 
 /* ================= HELPERS ================= */
@@ -61,6 +78,9 @@ export function normalizeSpirit(raw: string): BaseSpirit | null {
   if (!raw) return null;
 
   const key = raw.toLowerCase().trim();
+
+  /* ---------- BOURBON ---------- */
+  if (key.includes("bourbon")) return "bourbon";
 
   /* ---------- BRANDY & VARIANTS ---------- */
   if (key.includes("brandy")) return "brandy";
@@ -95,10 +115,30 @@ export function normalizeSpirit(raw: string): BaseSpirit | null {
   /* ---------- TEQUILA ---------- */
   if (key.includes("tequila")) return "tequila";
 
-  /* ---------- WINE & FORTIFIED ---------- */
+  /* ---------- VERMOUTH ---------- */
+  if (key.includes("vermouth")) return "vermouth";
+
+  /* ---------- CHAMPAGNE ---------- */
+  if (
+    key.includes("champagne") ||
+    key.includes("prosecco")
+  ) {
+    return "champagne";
+  }
+
+  /* ---------- LIQUEURS ---------- */
+  if (
+    key.includes("liqueur") ||
+    key.includes("triple sec") ||
+    key.includes("amaretto") ||
+    key.includes("baileys")
+  ) {
+    return "liqueur";
+  }
+
+  /* ---------- WINE (après vermouth !) ---------- */
   if (
     key.includes("wine") ||
-    key.includes("vermouth") ||
     key.includes("sherry")
   ) {
     return "wine";
