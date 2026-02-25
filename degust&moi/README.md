@@ -40,10 +40,23 @@ L’objectif n’est pas de vendre, mais d’éduquer et d’accompagner.
   - préférences de goût
   - intensité souhaitée
   - contexte ou humeur
-- Génération de **maximum 3 recommandations**
+- Génération de **maximum 4 recommandations**
 - Explication éducative pour chaque recommandation
 - Affichage de cocktails associés (via API externe)
-- Interface moderne avec micro-interactions (animations premium)
+- Interface moderne avec micro-interactions
+- Collection SVG premium personnalisée
+
+---
+
+## 🧠 Logique de recommandation
+
+La recommandation repose sur :
+- un système de scoring pondéré (goût + intensité + contexte)
+- gestion des oppositions d’intensité (léger vs fort)
+- diversification automatique par type d’alcool
+- légère variation contrôlée pour éviter les résultats identiques
+
+L’objectif n’est pas la complexité algorithmique, mais une logique claire, explicable et maintenable.
 
 ---
 
@@ -67,21 +80,9 @@ Le projet implémente :
 
 - Row Level Security (RLS)
 - Politiques d’accès par utilisateur
-- Protection des données sensibles
 - Isolation stricte des favoris par utilisateur
 
   Chaque utilisateur ne peut consulter, modifier ou supprimer que ses propres données.
-
----
-
-## 🧠 Logique de recommandation
-
-La recommandation repose sur :
-- des règles simples et lisibles
-- des correspondances entre préférences utilisateur et profils d’alcools
-- une logique transparente et explicable
-
-L’objectif n’est pas la précision algorithmique, mais la **compréhension et l’apprentissage**.
 
 ---
 
@@ -98,9 +99,8 @@ Cette API permet d’afficher :
 - un exemple réel et représentatif
 - une image
 - un nom
-- une description simple
-
-Les données sont utilisées à titre informatif et pédagogique uniquement.
+- des instructions
+- des ingrédients
 
 Les appels API sont centralisés via des API Routes Next.js afin de :
 
@@ -108,27 +108,31 @@ Les appels API sont centralisés via des API Routes Next.js afin de :
 - Sécuriser les appels externes
 - Faciliter l’évolution du projet
 
+Les données sont utilisées à titre informatif et pédagogique uniquement.
+
 ---
 
 ## 🧱 Stack technique
 
-- **Framework** : Next.js (App Router)
-- **UI** : React
-- **Langage** : TypeScript
-- **Styles** : Tailwind CSS
-- **Backend** :
-  - API Routes Next.js
-  - Supabase (Base de données + Authentification)
-- **Base de données** : PostgreSQL (via Supabase)
-- **Authentification** : Email / mot de passe (Supabase Auth)
-- **API externe** : TheCocktailDB
-- **Déploiement** : Vercel (prévu)
+### Frontend
+- Next.js (App Router)
+- React
+- TypeScript
+- Tailwind CSS
 
-Cette stack a été choisie pour :
+### Backend
 
-- Sa popularité sur le marché
-- Sa pertinence pour un projet SaaS moderne
-- Sa scalabilité pour une évolution future
+- API Routes Next.js
+- Supabase
+
+### Base de données
+
+- PostgreSQL (via Supabase)
+
+### Authentification
+
+- Supabase Auth (email / mot de passe)
+
 ---
 
 ## 🗂️ Architecture simplifiée
@@ -150,10 +154,23 @@ src/
 │        └─ route.ts
 ├─ lib/
 │  ├─ recommendation.ts
+│  ├─ spiritMapping.ts
 │  └─ supabase.ts
 └─ data/
-   └─ alcohols.ts
+   └─ generatedAlcohols.json
 ```
+
+---
+
+## 💼 Compétences démontrées
+
+- Conception d’un MVP produit
+- Architecture full-stack moderne
+- Intégration d’une API tierce
+- Sécurisation d’une base de données avec RLS
+- Logique métier structurée et maintenable
+- Création d’un design system SVG personnalisé
+- Approche UX orientée pédagogie
 
 ---
 
@@ -180,8 +197,7 @@ http://localhost:3000
 
 ## 🚀 Évolution future possible
 
-Sauvegarde de l’historique des questionnaires
-
+- Sauvegarde de l’historique des questionnaires
 - Profil utilisateur avancé
 - Recommandations plus dynamiques
 - Internationalisation complète
@@ -209,6 +225,6 @@ Dégust&Moi est un MVP portfolio combinant :
 - Micro-interactions UI modernes
 - Architecture évolutive
 
-Un projet démontrant des compétences full-stack modernes.
+Un projet démontrant des compétences full-stack modernes dans un contexte produit réaliste.
 
 ---
