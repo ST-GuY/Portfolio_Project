@@ -72,6 +72,25 @@ export default function AuthPage() {
     }
   }
 
+  /* ================= RESET PASSWORD ================= */
+
+  async function handleForgotPassword() {
+    if (!email) {
+      setMessage("Entre ton email pour recevoir le lien.");
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "http://localhost:3000/reset-password",
+    });
+
+    if (error) {
+      setMessage(error.message);
+    } else {
+      setMessage("📩 Email de réinitialisation envoyé !");
+    }
+  }
+
   /* ================= LOGOUT ================= */
 
   async function handleLogout() {
@@ -116,6 +135,15 @@ export default function AuthPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+
+            {/* ===== Forgot password button ===== */}
+
+            <button
+              onClick={handleForgotPassword}
+              className="text-sm text-neutral-300 hover:text-white transition text-left"
+            >
+              Mot de passe oublié ?
+            </button>
 
             <div className="flex gap-2">
               <button

@@ -51,34 +51,34 @@ export default function ResultatsPage() {
     }
   }
 
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
+useEffect(() => {
+  const checkSession = async () => {
+    const { data } = await supabase.auth.getSession();
 
-      if (!data.session) {
-        router.push("/auth");
-        return;
-      }
-
+    if (data.session) {
       const currentUser = data.session.user;
       setUser(currentUser);
       loadFavorites(currentUser.id);
-    };
+    }
+  };
 
-    checkSession();
+  checkSession();
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (!session) {
-          router.push("/auth");
-        }
+  const { data: listener } = supabase.auth.onAuthStateChange(
+    (_event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        loadFavorites(session.user.id);
+      } else {
+        setUser(null);
       }
-    );
+    }
+  );
 
-    return () => {
-      listener.subscription.unsubscribe();
-    };
-  }, []);
+  return () => {
+    listener.subscription.unsubscribe();
+  };
+}, []);
 
   /* ================= LANGUAGE + RECOMMENDATIONS ================= */
 
