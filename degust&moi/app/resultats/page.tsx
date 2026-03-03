@@ -340,6 +340,7 @@ useEffect(() => {
                           alt={drink.strDrink}
                           width={120}
                           height={120}
+                          unoptimized
                           className="rounded-xl object-cover shadow-md"
                         />
                       )}
