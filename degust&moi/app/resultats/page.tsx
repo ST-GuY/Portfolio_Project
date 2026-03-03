@@ -82,19 +82,48 @@ useEffect(() => {
 
   /* ================= LANGUAGE + RECOMMENDATIONS ================= */
 
-  useEffect(() => {
-    const storedLang = localStorage.getItem("lang") as Lang | null;
-    if (storedLang) setLang(storedLang);
+useEffect(() => {
+  const storedLang = localStorage.getItem("lang") as Lang | null;
+  if (storedLang) setLang(storedLang);
 
-    const storedAnswers = localStorage.getItem("degust-moi-answers");
-    if (!storedAnswers) return;
+  const storedAnswers = localStorage.getItem("degust-moi-answers");
 
+  if (!storedAnswers) {
+    console.warn("Aucune réponse trouvée dans localStorage");
+    return;
+  }
+
+  try {
     const answers = JSON.parse(storedAnswers);
     const recos = getRecommendations(answers);
-    setRecommendations(recos);
 
-    fetchCocktails(recos);
-  }, []);
+    if (recos && recos.length > 0) {
+      setRecommendations(recos);
+      fetchCocktails(recos);
+    }
+  } catch (error) {
+    console.error("Erreur parsing answers:", error);
+  }
+}, []);
+
+
+/* 🔥 LISTENER LANGUE (FR / EN) */
+
+useEffect(() => {
+  const handleLanguageChange = () => {
+    const updatedLang = localStorage.getItem("lang") as Lang | null;
+    if (updatedLang) {
+      setLang(updatedLang);
+    }
+  };
+
+  window.addEventListener("languageChange", handleLanguageChange);
+
+  return () => {
+    window.removeEventListener("languageChange", handleLanguageChange);
+  };
+}, []);
+
 
   /* ================= FETCH COCKTAILS ================= */
 
