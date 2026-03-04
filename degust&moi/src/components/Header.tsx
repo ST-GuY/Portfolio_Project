@@ -46,9 +46,14 @@ export default function Header() {
     setFavoritesCount(data?.length ?? 0);
   }
 
-  function refreshFavorites() {
-    if (user) loadFavorites(user.id);
+  async function refreshFavorites() {
+  const { data } = await supabase.auth.getUser();
+
+  if (data.user) {
+    setUser(data.user);
+    loadFavorites(data.user.id);
   }
+}
 
   function loadLang() {
     const stored = localStorage.getItem("lang") as "fr" | "en" | null;
@@ -68,7 +73,7 @@ export default function Header() {
 
   return (
     <header className="fixed top-6 right-6 z-50 max-w-[90vw]">
-      <div className="flex items-center gap-3 px-6 py-3 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/10 shadow-2xl">
+      <div className="flex items-center gap-3 px-6 py-3 rounded-3xl bg-white/10 backdrop-blur-2xl border border-white/20 shadow-[0_10px_40px_rgba(0,0,0,0.35)] ring-1 ring-white/10">
 
         {/* Accueil */}
         <Link href="/" className="glass-btn">

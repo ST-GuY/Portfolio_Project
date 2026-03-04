@@ -51,116 +51,107 @@ export default function ResultatsPage() {
     }
   }
 
-useEffect(() => {
-  const checkSession = async () => {
-    const { data } = await supabase.auth.getSession();
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
 
-    if (data.session) {
-      const currentUser = data.session.user;
-      setUser(currentUser);
-      loadFavorites(currentUser.id);
-    }
-  };
-
-  checkSession();
-
-  const { data: listener } = supabase.auth.onAuthStateChange(
-    (_event, session) => {
-      if (session?.user) {
-        setUser(session.user);
-        loadFavorites(session.user.id);
-      } else {
-        setUser(null);
+      if (data.session) {
+        const currentUser = data.session.user;
+        setUser(currentUser);
+        loadFavorites(currentUser.id);
       }
-    }
-  );
+    };
 
-  return () => {
-    listener.subscription.unsubscribe();
-  };
-}, []);
+    checkSession();
+
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (session?.user) {
+          setUser(session.user);
+          loadFavorites(session.user.id);
+        } else {
+          setUser(null);
+        }
+      }
+    );
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
 
   /* ================= LANGUAGE + RECOMMENDATIONS ================= */
 
-useEffect(() => {
-  const storedLang = localStorage.getItem("lang") as Lang | null;
-  if (storedLang) setLang(storedLang);
+  useEffect(() => {
+    const storedLang = localStorage.getItem("lang") as Lang | null;
+    if (storedLang) setLang(storedLang);
 
-  const storedAnswers = localStorage.getItem("degust-moi-answers");
+    const storedAnswers = localStorage.getItem("degust-moi-answers");
 
-  if (!storedAnswers) {
-    console.warn("Aucune réponse trouvée dans localStorage");
-    return;
-  }
-
-  try {
-    const answers = JSON.parse(storedAnswers);
-    const recos = getRecommendations(answers);
-
-    if (recos && recos.length > 0) {
-      setRecommendations(recos);
-      fetchCocktails(recos);
+    if (!storedAnswers) {
+      console.warn("Aucune réponse trouvée dans localStorage");
+      return;
     }
-  } catch (error) {
-    console.error("Erreur parsing answers:", error);
-  }
-}, []);
 
+    try {
+      const answers = JSON.parse(storedAnswers);
+      const recos = getRecommendations(answers);
 
-/* 🔥 LISTENER LANGUE (FR / EN) */
-
-useEffect(() => {
-  const handleLanguageChange = () => {
-    const updatedLang = localStorage.getItem("lang") as Lang | null;
-    if (updatedLang) {
-      setLang(updatedLang);
+      if (recos && recos.length > 0) {
+        setRecommendations(recos);
+        fetchCocktails(recos);
+      }
+    } catch (error) {
+      console.error("Erreur parsing answers:", error);
     }
-  };
+  }, []);
 
-  window.addEventListener("languageChange", handleLanguageChange);
+  /* 🔥 LISTENER LANGUE (FR / EN) */
 
-  return () => {
-    window.removeEventListener("languageChange", handleLanguageChange);
-  };
-}, []);
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      const updatedLang = localStorage.getItem("lang") as Lang | null;
+      if (updatedLang) {
+        setLang(updatedLang);
+      }
+    };
 
+    window.addEventListener("languageChange", handleLanguageChange);
+
+    return () => {
+      window.removeEventListener("languageChange", handleLanguageChange);
+    };
+  }, []);
 
   /* ================= FETCH COCKTAILS ================= */
 
   async function fetchCocktails(recos: Recommendation[]) {
     const INGREDIENTS_BY_BASE: Record<BaseSpirit, string[]> = {
-  /* 🍹 RUM */
-  white_rum: ["Light rum", "White rum"],
-  amber_rum: ["Dark rum", "Spiced rum", "Gold rum"],
+      white_rum: ["Light rum", "White rum"],
+      amber_rum: ["Dark rum", "Spiced rum", "Gold rum"],
 
-  /* 🥃 WHISKY */
-  whisky: ["Whiskey", "Scotch", "Rye whiskey", "Blended whiskey"],
-  bourbon: ["Bourbon"],
+      whisky: ["Whiskey", "Scotch", "Rye whiskey", "Blended whiskey"],
+      bourbon: ["Bourbon"],
 
-  /* 🍸 CLEAR SPIRITS */
-  vodka: ["Vodka"],
-  gin: ["Gin"],
-  tequila: ["Tequila", "Blanco tequila", "Reposado tequila"],
+      vodka: ["Vodka"],
+      gin: ["Gin"],
+      tequila: ["Tequila", "Blanco tequila", "Reposado tequila"],
 
-  /* 🥃 BRANDY */
-  brandy: ["Brandy", "Cognac", "Armagnac"],
+      brandy: ["Brandy", "Cognac", "Armagnac"],
 
-  /* 🍷 WINE & FORTIFIED */
-  wine: ["Red wine", "White wine", "Sherry"],
-  vermouth: ["Vermouth", "Sweet Vermouth", "Dry Vermouth"],
+      wine: ["Red wine", "White wine", "Sherry"],
+      vermouth: ["Vermouth", "Sweet Vermouth", "Dry Vermouth"],
 
-  /* 🍾 SPARKLING */
-  champagne: ["Champagne", "Prosecco"],
+      champagne: ["Champagne", "Prosecco"],
 
-  /* 🍹 LIQUEURS */
-  liqueur: [
-    "Triple Sec",
-    "Amaretto",
-    "Baileys",
-    "Coffee liqueur",
-    "Kahlua",
-  ],
-};
+      liqueur: [
+        "Triple Sec",
+        "Amaretto",
+        "Baileys",
+        "Coffee liqueur",
+        "Kahlua",
+      ],
+    };
 
     for (const [index, rec] of recos.entries()) {
       const ingredients = INGREDIENTS_BY_BASE[rec.fallbackSpirit];
@@ -226,6 +217,8 @@ useEffect(() => {
       setFavorites((prev) =>
         prev.filter((f) => f.idDrink !== drink.idDrink)
       );
+
+      window.dispatchEvent(new Event("favoritesUpdated")); // ⭐ update header
     } else {
       await supabase.from("favorites").insert({
         user_id: user.id,
@@ -234,6 +227,8 @@ useEffect(() => {
       });
 
       setFavorites((prev) => [...prev, drink]);
+
+      window.dispatchEvent(new Event("favoritesUpdated")); // ⭐ update header
 
       setLastAdded(null);
       setTimeout(() => {
@@ -259,7 +254,6 @@ useEffect(() => {
           return (
             <div key={index} className="glass-card space-y-8">
 
-              {/* TITRE + DESCRIPTION */}
               <div>
                 <h2 className="text-2xl font-semibold">
                   {rec.name[lang]}
@@ -269,7 +263,6 @@ useEffect(() => {
                 </p>
               </div>
 
-              {/* IMAGE BOUTEILLE */}
               {rec.bottle && (
                 <div className="flex gap-6 items-center bg-white/40 dark:bg-white/10 p-4 rounded-xl backdrop-blur-sm">
                   <Image
@@ -290,7 +283,6 @@ useEffect(() => {
                 </div>
               )}
 
-              {/* COCKTAILS */}
               {drinks?.map((drink, i) => {
                 const isFavorite = favorites.some(
                   (f) => f.idDrink === drink.idDrink

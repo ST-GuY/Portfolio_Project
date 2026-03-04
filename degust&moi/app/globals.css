@@ -118,10 +118,11 @@ option {
       border border-white/10
       text-white text-sm
       hover:bg-white/20
+      hover:scale-105
       transition-all
       duration-200
       active:scale-95;
-  }
+}
 }
 
 /* ================= FAVORITE GLOW ================= */
@@ -129,3 +130,8 @@ option {
 .favorite-glow {
   box-shadow: 0 0 12px rgba(244, 63, 94, 0.45);
 }
+
+.animate-badge {
+  animation: badgePop 0.3s ease;
+}
+
