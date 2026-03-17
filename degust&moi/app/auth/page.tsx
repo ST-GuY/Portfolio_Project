@@ -5,17 +5,61 @@ import { supabase } from "@/src/lib/supabase";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 
+/* ================= TYPES ================= */
+
+type Lang = "fr" | "en";
+
+const TEXTS = {
+  fr: {
+    title: "Authentification",
+    email: "Email",
+    password: "Mot de passe",
+    forgot: "Mot de passe oublié ?",
+    signup: "S'inscrire",
+    signin: "Se connecter",
+    logout: "Se déconnecter",
+    connected: "Connecté en tant que",
+    resetRequired: "Entre ton email pour recevoir le lien.",
+    resetSent: "📩 Email de réinitialisation envoyé !",
+  },
+  en: {
+    title: "Authentication",
+    email: "Email",
+    password: "Password",
+    forgot: "Forgot password?",
+    signup: "Sign up",
+    signin: "Sign in",
+    logout: "Logout",
+    connected: "Logged in as",
+    resetRequired: "Enter your email to receive the link.",
+    resetSent: "📩 Reset email sent!",
+  },
+};
+
 export default function AuthPage() {
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [lang, setLang] = useState<Lang>("fr");
   const router = useRouter();
+
+  const t = TEXTS[lang];
 
   /* ================= CHECK USER ================= */
 
   useEffect(() => {
     checkUser();
+
+    const storedLang = localStorage.getItem("lang") as Lang | null;
+    if (storedLang) setLang(storedLang);
+
+    const handleLanguageChange = () => {
+      const updatedLang = localStorage.getItem("lang") as Lang | null;
+      if (updatedLang) setLang(updatedLang);
+    };
+
+    window.addEventListener("languageChange", handleLanguageChange);
 
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
@@ -29,6 +73,7 @@ export default function AuthPage() {
     );
 
     return () => {
+      window.removeEventListener("languageChange", handleLanguageChange);
       listener.subscription.unsubscribe();
     };
   }, []);
@@ -76,7 +121,7 @@ export default function AuthPage() {
 
   async function handleForgotPassword() {
     if (!email) {
-      setMessage("Entre ton email pour recevoir le lien.");
+      setMessage(t.resetRequired);
       return;
     }
 
@@ -87,7 +132,7 @@ export default function AuthPage() {
     if (error) {
       setMessage(error.message);
     } else {
-      setMessage("📩 Email de réinitialisation envoyé !");
+      setMessage(t.resetSent);
     }
   }
 
@@ -103,26 +148,26 @@ export default function AuthPage() {
   return (
     <main className="min-h-screen flex items-center justify-center">
       <div className="bg-white/10 backdrop-blur-md p-8 rounded-xl w-full max-w-md space-y-4">
-        <h1 className="text-2xl font-bold text-center">Authentification</h1>
+        <h1 className="text-2xl font-bold text-center">{t.title}</h1>
 
         {user ? (
           <>
             <p className="text-center">
-              Connecté en tant que <strong>{user.email}</strong>
+              {t.connected} <strong>{user.email}</strong>
             </p>
 
             <button
               onClick={handleLogout}
               className="w-full bg-neutral-500 hover:bg-neutral-600 p-2 rounded"
             >
-              Se déconnecter
+              {t.logout}
             </button>
           </>
         ) : (
           <>
             <input
               type="email"
-              placeholder="Email"
+              placeholder={t.email}
               className="w-full p-2 rounded bg-white/20"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -130,19 +175,17 @@ export default function AuthPage() {
 
             <input
               type="password"
-              placeholder="Mot de passe"
+              placeholder={t.password}
               className="w-full p-2 rounded bg-white/20"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
 
-            {/* ===== Forgot password button ===== */}
-
             <button
               onClick={handleForgotPassword}
               className="text-sm text-neutral-300 hover:text-white transition text-left"
             >
-              Mot de passe oublié ?
+              {t.forgot}
             </button>
 
             <div className="flex gap-2">
@@ -150,14 +193,14 @@ export default function AuthPage() {
                 onClick={handleSignUp}
                 className="flex-1 bg-rose-600 hover:bg-rose-700 p-2 rounded"
               >
-                S'inscrire
+                {t.signup}
               </button>
 
               <button
                 onClick={handleSignIn}
                 className="flex-1 bg-neutral-700 hover:bg-neutral-800 p-2 rounded"
               >
-                Se connecter
+                {t.signin}
               </button>
             </div>
           </>
